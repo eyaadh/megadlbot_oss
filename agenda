@@ -1,0 +1,49 @@
+Introduction:
+Megatron was a telegram file management bot that helped a lot of users, specially movie channel managers to upload
+their files to telegram by just providing a link to it. The project initially started as roanuedhuru_bot which lately
+retired and came back as Megatron which was a side project of the
+famous Maldivian Telegram community - @Baivaru until it retired.
+
+Agenda:
+1. Introduction:
+    Setting up [x]
+    - common command:
+        - on message_ filter for commands - [x]
+    - download/Upload:
+        - initial portion [x]
+
+2. Rename:
+    - InlineButtons [x]
+    - callback queries [x]
+    - force reply [x]
+
+3. Media Info:
+    - Cross check for video files to add the media info Inline Button [x]
+    - Integration of ffprobe to extract media info
+        from Video files, basically that also includes creating subprocesses
+        to run a shell command [x]
+
+4. Integrating with a DB for global Download/Upload Settings:
+    - Attending subscribers comments first [x]
+    Note: with the last video we did media info and it was saved to a json file, there was a request to save this file
+    to text, well as you remember we had always listen to our community and got things done as always what they wanted,
+    lets keep the same spirit.
+    - Introducing a DB for the APP to record user settings [x]
+
+5. Updating dld_settings:
+    - Edit Reply Markup [x]
+    - Updating/Amend documents on Mongo [x]
+    - Saving Image Files to DB as base64 [x]
+
+
+6. Implying dld_settings to upload:
+    - Fixing a huge bug I left unattended in last video [x]
+    - converting base64 strings/bytes to files [x]
+    - define thumbnails on the uploads [x]
+
+    we will look at that cb query thing later, either way we have completed everything that is scheduled for
+    todays agenda... its a busy day so lets conclude the video here :-) also in a nutshell that completes
+    the dldsettings and what megadlbot's main functionality, whats next? probably integrate YTDL too? ;)
+    lets see....
+    have a good day ahead :)
+

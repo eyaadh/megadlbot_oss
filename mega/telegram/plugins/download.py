@@ -55,9 +55,8 @@ async def new_message_dl_handler(c: MegaDLBot, m: Message):
                 )
 
 
-@MegaDLBot.on_callback_query(group=0)
-async def callback_query_handler(c: MegaDLBot, cb: CallbackQuery):
-    cb_function = str(cb.data).split("_")[0]
+@MegaDLBot.on_callback_query(filters.regex("^download.*"), group=0)
+async def callback_download_handler(c: MegaDLBot, cb: CallbackQuery):
     cb_chat = int(str(cb.data).split("_")[1]) if len(str(cb.data).split("_")) > 1 else None
     cb_message_id = int(str(cb.data).split("_")[2]) if len(str(cb.data).split("_")) > 2 else None
 
@@ -65,45 +64,56 @@ async def callback_query_handler(c: MegaDLBot, cb: CallbackQuery):
 
     await cb.answer()
 
-    if cb_function == "download" and cb.message.chat.id == cb_chat:
-        ack_message = await cb_message.reply_text(
-            "About to start downloading the file to Local."
-        )
+    ack_message = await cb_message.reply_text(
+        "About to start downloading the file to Local."
+    )
 
-        await Downloader().download_file(cb_message.text, ack_message, None)
+    await Downloader().download_file(cb_message.text, ack_message, None)
 
-    if cb_function == "rename" and cb.message.chat.id == cb_chat:
-        await cb.message.reply_text(
-            f"RENAME_{cb_message_id}:\n"
-            f"Send me the new name of the file as a reply to this message.",
-            reply_markup=ForceReply(True)
-        )
 
-    if cb_function == "info" and cb.message.chat.id == cb_chat:
-        m_info, neko_link = await MediaInfo().get_media_info(cb_message.text)
-        if m_info:
-            try:
-                await cb.message.reply_document(
-                    caption="Here is the Media Info you requested: \n"
-                            f"{emoji.CAT} View on nekobin.com: {neko_link}",
-                    document=m_info
-                )
-            finally:
-                if os.path.exists(m_info):
-                    os.remove(m_info)
+@MegaDLBot.on_callback_query(filters.regex("^rename.*"), group=1)
+async def callback_rename_handler(c: MegaDLBot, cb: CallbackQuery):
+    await cb.answer()
+    cb_message_id = int(str(cb.data).split("_")[2]) if len(str(cb.data).split("_")) > 2 else None
+    await cb.message.reply_text(
+        f"RENAME_{cb_message_id}:\n"
+        f"Send me the new name of the file as a reply to this message.",
+        reply_markup=ForceReply(True)
+    )
 
-    @MegaDLBot.on_message(filters.reply & filters.private, group=1)
-    async def reply_message_handler(c: MegaDLBot, m: Message):
-        func_message_obj = str(m.reply_to_message.text).splitlines()[0].split("_")
-        if len(func_message_obj) > 1:
-            func = func_message_obj[0]
-            org_message_id = int(str(func_message_obj[1]).replace(":", ""))
-            org_message = await c.get_messages(m.chat.id, org_message_id)
-            if func == "RENAME":
-                new_file_name = m.text
 
-                ack_message = await m.reply_text(
-                    "About to start downloading the file to Local."
-                )
+@MegaDLBot.on_callback_query(filters.regex("^info.*"), group=2)
+async def callback_info_handler(c: MegaDLBot, cb: CallbackQuery):
+    cb_chat = int(str(cb.data).split("_")[1]) if len(str(cb.data).split("_")) > 1 else None
+    cb_message_id = int(str(cb.data).split("_")[2]) if len(str(cb.data).split("_")) > 2 else None
 
-                await Downloader().download_file(org_message.text, ack_message, new_file_name)
+    await cb.answer()
+    cb_message = await c.get_messages(cb_chat, cb_message_id) if cb_message_id is not None else None
+    m_info, neko_link = await MediaInfo().get_media_info(cb_message.text)
+    if m_info:
+        try:
+            await cb.message.reply_document(
+                caption="Here is the Media Info you requested: \n"
+                        f"{emoji.CAT} View on nekobin.com: {neko_link}",
+                document=m_info
+            )
+        finally:
+            if os.path.exists(m_info):
+                os.remove(m_info)
+
+
+@MegaDLBot.on_message(filters.reply & filters.private, group=1)
+async def reply_message_handler(c: MegaDLBot, m: Message):
+    func_message_obj = str(m.reply_to_message.text).splitlines()[0].split("_")
+    if len(func_message_obj) > 1:
+        func = func_message_obj[0]
+        org_message_id = int(str(func_message_obj[1]).replace(":", ""))
+        org_message = await c.get_messages(m.chat.id, org_message_id)
+        if func == "RENAME":
+            new_file_name = m.text
+
+            ack_message = await m.reply_text(
+                "About to start downloading the file to Local."
+            )
+
+            await Downloader().download_file(org_message.text, ack_message, new_file_name)

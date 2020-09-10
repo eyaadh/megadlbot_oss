@@ -41,9 +41,8 @@ Agenda:
     - converting base64 strings/bytes to files [x]
     - define thumbnails on the uploads [x]
 
-    we will look at that cb query thing later, either way we have completed everything that is scheduled for
-    todays agenda... its a busy day so lets conclude the video here :-) also in a nutshell that completes
-    the dldsettings and what megadlbot's main functionality, whats next? probably integrate YTDL too? ;)
-    lets see....
-    have a good day ahead :)
-
+7. Moving the callback filters to regex:
+    - Bug Fixes 🤷‍ I have no idea what else to call this [x]
+    with that lets conclude the video... basically lets take this as a pathway to custom filters which we will
+    also do within this project, however I do like these regex filters too, since they are simple and very
+    straight forward and easy,.... with that being said have a nice day ahead :-)

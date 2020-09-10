@@ -27,33 +27,34 @@ async def dld_settings_handler(c: MegaDLBot, m: Message):
     )
 
 
-@MegaDLBot.on_callback_query(group=1)
+@MegaDLBot.on_callback_query(filters.regex("^dlsettings.*"), group=3)
 async def callback_query_dld_settings_handler(c: MegaDLBot, cb: CallbackQuery):
-    cb_function = str(cb.data).split("_")[0]
-    cb_chat = int(str(cb.data).split("_")[1]) if len(str(cb.data).split("_")) > 1 else None
-
     await cb.answer()
 
-    if cb_function == "dlsettings" and cb.message.chat.id == cb_chat:
-        await cb.message.edit_reply_markup(
-            InlineKeyboardMarkup(
-                [
-                    [InlineKeyboardButton(text=f"{emoji.PAPERCLIP} Force Document",
-                                          callback_data="f-docs")],
-                    [InlineKeyboardButton(text=f"{emoji.BRIEFCASE} Force Document w Thumbnail",
-                                          callback_data="ct-docs")],
-                    [InlineKeyboardButton(text=f"{emoji.VIDEOCASSETTE} Video w Thumbnail",
-                                          callback_data="ct-videos")],
-                ]
-            )
+    await cb.message.edit_reply_markup(
+        InlineKeyboardMarkup(
+            [
+                [InlineKeyboardButton(text=f"{emoji.PAPERCLIP} Force Document",
+                                      callback_data="f-docs")],
+                [InlineKeyboardButton(text=f"{emoji.BRIEFCASE} Force Document w Thumbnail",
+                                      callback_data="ct-docs")],
+                [InlineKeyboardButton(text=f"{emoji.VIDEOCASSETTE} Video w Thumbnail",
+                                      callback_data="ct-videos")],
+            ]
         )
-    elif cb_function == "thumbnail" and cb.message.chat.id == cb_chat:
-        await cb.message.reply_text(
-            f"CST_{cb.message.message_id}\n"
-            f"As a reply to this message, send me the Photo/Image you wish to set as a custom thumbnail for "
-            f"your uploads/downloads.",
-            reply_markup=ForceReply(True)
-        )
+    )
+
+
+@MegaDLBot.on_callback_query(filters.regex("^thumbnail.*"), group=4)
+async def callback_query_thumbnail_handler(c: MegaDLBot, cb: CallbackQuery):
+    await cb.answer()
+
+    await cb.message.reply_text(
+        f"CST_{cb.message.message_id}\n"
+        f"As a reply to this message, send me the Photo/Image you wish to set as a custom thumbnail for "
+        f"your uploads/downloads.",
+        reply_markup=ForceReply(True)
+    )
 
 
 @MegaDLBot.on_message(filters.reply & filters.private & filters.photo, group=2)

@@ -6,6 +6,7 @@ from mega.telegram import MegaDLBot
 from mega.helpers.media_info import MediaInfo
 from mega.helpers.downloader import Downloader
 from mega.database.users import MegaUsers
+from mega.database.files import MegaFiles
 
 
 @MegaDLBot.on_message(filters.private & filters.text, group=0)
@@ -21,38 +22,58 @@ async def new_message_dl_handler(c: MegaDLBot, m: Message):
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
     if re.match(regex, m.text):
-        header_info = await Downloader.get_headers(m.text)
-        file_type_raw = header_info.get("Content-Type") if "Content-Type" in header_info else "None/None"
-        file_type_split = file_type_raw.split("/")[0]
+        url_count = await MegaFiles().count_files_by_url(m.text)
+        if url_count == 0:
+            await url_process(m)
+        else:
+            url_details = await MegaFiles().get_file_by_url(m.text)
+            files = [
+                f"<a href='http://t.me/megadlbot?start=plf-{file['file_id']}'>{file['file_name']} - {file['file_type']}</a>"
+                for file in url_details
+            ]
+            files_msg_formatted = '/n'.join(files)
 
-        if header_info is None:
             await m.reply_text(
-                f"I do not know the details of the file to download the file! {emoji.MAN_RAISING_HAND_DARK_SKIN_TONE}"
+                f"I also do have the following files that were uploaded earlier with the same url:\n"
+                f"{files_msg_formatted}",
+                disable_web_page_preview=True
             )
-        elif header_info is not None:
-            file_size = header_info.get("Content-Length") if "Content-Length" in header_info else None
-            if file_size is not None and int(file_size) > 2147483648:
-                await m.reply_text(
-                    f"Well that file is bigger than I can upload to telegram! {emoji.MAN_SHRUGGING_DARK_SKIN_TONE}"
-                )
-            else:
-                inline_buttons = [
-                        [
-                            InlineKeyboardButton(text=f"{emoji.FLOPPY_DISK} Download",
-                                                 callback_data=f"download_{m.chat.id}_{m.message_id}"),
-                            InlineKeyboardButton(text=f"{emoji.PENCIL} Rename",
-                                                 callback_data=f"rename_{m.chat.id}_{m.message_id}")
-                        ]
-                    ]
-                if file_type_split.lower() == "video":
-                    inline_buttons.append([
-                            InlineKeyboardButton(text=f"{emoji.LIGHT_BULB} Media Info",
-                                                 callback_data=f"info_{m.chat.id}_{m.message_id}")
-                        ])
-                await m.reply_text(
-                    text="What would you like to do with this file?",
-                    reply_markup=InlineKeyboardMarkup(inline_buttons)
-                )
+            await url_process(m)
+
+
+async def url_process(m: Message):
+    header_info = await Downloader.get_headers(m.text)
+    file_type_raw = header_info.get("Content-Type") if "Content-Type" in header_info else "None/None"
+    file_type_split = file_type_raw.split("/")[0]
+
+    if header_info is None:
+        await m.reply_text(
+            f"I do not know the details of the file to download the file! {emoji.MAN_RAISING_HAND_DARK_SKIN_TONE}"
+        )
+    elif header_info is not None:
+        file_size = header_info.get("Content-Length") if "Content-Length" in header_info else None
+        if file_size is not None and int(file_size) > 2147483648:
+            await m.reply_text(
+                f"Well that file is bigger than I can upload to telegram! {emoji.MAN_SHRUGGING_DARK_SKIN_TONE}"
+            )
+        else:
+            inline_buttons = [
+                [
+                    InlineKeyboardButton(text=f"{emoji.FLOPPY_DISK} Download",
+                                         callback_data=f"download_{m.chat.id}_{m.message_id}"),
+                    InlineKeyboardButton(text=f"{emoji.PENCIL} Rename",
+                                         callback_data=f"rename_{m.chat.id}_{m.message_id}")
+                ]
+            ]
+            if file_type_split.lower() == "video":
+                inline_buttons.append([
+                    InlineKeyboardButton(text=f"{emoji.LIGHT_BULB} Media Info",
+                                         callback_data=f"info_{m.chat.id}_{m.message_id}")
+                ])
+            await m.reply_text(
+                text="What would you like to do with this file?",
+                reply_markup=InlineKeyboardMarkup(inline_buttons)
+            )
 
 
 @MegaDLBot.on_callback_query(filters.regex("^download.*"), group=0)

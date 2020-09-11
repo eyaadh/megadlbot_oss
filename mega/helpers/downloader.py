@@ -13,6 +13,7 @@ import humanfriendly as size
 from pyrogram.types import Message
 from mega.telegram import MegaDLBot
 from mega.database.users import MegaUsers
+from mega.database.files import MegaFiles
 
 status_progress = {}
 
@@ -60,10 +61,10 @@ class Downloader:
 
                             status_progress[f"{ack_message.chat.id}{ack_message.message_id}"][
                                 "last_download_updated"] = time.time()
-        await Downloader().upload_file(temp_file, ack_message)
+        await Downloader().upload_file(temp_file, ack_message, url)
 
     @staticmethod
-    async def upload_file(temp_file: str, ack_message: Message):
+    async def upload_file(temp_file: str, ack_message: Message, url: str):
         await MegaDLBot.edit_message_text(
             chat_id=ack_message.chat.id,
             message_id=ack_message.message_id,
@@ -74,27 +75,53 @@ class Downloader:
         try:
             user_details = await MegaUsers().get_user(ack_message.chat.id)
             if user_details['dld_settings'] == 'default':
-                await MegaDLBot.send_document(
+                file_message = await MegaDLBot.send_document(
                     chat_id=ack_message.chat.id,
                     document=temp_file,
                     progress=Downloader().upload_progress_hook,
                     progress_args=[ack_message.chat.id, ack_message.message_id]
                 )
+
+                await MegaFiles().insert_new_files(
+                    filed_id=file_message.document.file_id,
+                    file_name=file_message.document.file_name,
+                    msg_id=file_message.message_id,
+                    chat_id=file_message.chat.id,
+                    file_type=file_message.document.mime_type,
+                    url=url
+                )
+
             elif user_details['dld_settings'] == 'f-docs':
-                await MegaDLBot.send_document(
+                file_message = await MegaDLBot.send_document(
                     chat_id=ack_message.chat.id,
                     document=temp_file,
                     progress=Downloader().upload_progress_hook,
                     progress_args=[ack_message.chat.id, ack_message.message_id]
+                )
+                await MegaFiles().insert_new_files(
+                    filed_id=file_message.document.file_id,
+                    file_name=file_message.document.file_name,
+                    msg_id=file_message.message_id,
+                    chat_id=file_message.chat.id,
+                    file_type=file_message.document.mime_type,
+                    url=url
                 )
             elif user_details['dld_settings'] == 'ct-docs':
                 temp_thumb = await Downloader().get_thumbnail(user_details['custom_thumbnail'])
-                await MegaDLBot.send_document(
+                file_message = await MegaDLBot.send_document(
                     chat_id=ack_message.chat.id,
                     document=temp_file,
                     progress=Downloader().upload_progress_hook,
                     progress_args=[ack_message.chat.id, ack_message.message_id],
                     thumb=temp_thumb
+                )
+                await MegaFiles().insert_new_files(
+                    filed_id=file_message.document.file_id,
+                    file_name=file_message.document.file_name,
+                    msg_id=file_message.message_id,
+                    chat_id=file_message.chat.id,
+                    file_type=file_message.document.mime_type,
+                    url=url
                 )
 
                 if os.path.exists(temp_thumb):
@@ -104,20 +131,36 @@ class Downloader:
                 temp_thumb = await Downloader().get_thumbnail(user_details['custom_thumbnail'])
 
                 if str(file_type[0]).split("/")[0].lower() == "video":
-                    await MegaDLBot.send_video(
+                    file_message = await MegaDLBot.send_video(
                         chat_id=ack_message.chat.id,
                         video=temp_file,
                         progress=Downloader().upload_progress_hook,
                         progress_args=[ack_message.chat.id, ack_message.message_id],
                         thumb=temp_thumb
                     )
+                    await MegaFiles().insert_new_files(
+                        filed_id=file_message.video.file_id,
+                        file_name=file_message.video.file_name,
+                        msg_id=file_message.message_id,
+                        chat_id=file_message.chat.id,
+                        file_type=file_message.video.mime_type,
+                        url=url
+                    )
                 else:
-                    await MegaDLBot.send_document(
+                    file_message = await MegaDLBot.send_document(
                         chat_id=ack_message.chat.id,
                         document=temp_file,
                         progress=Downloader().upload_progress_hook,
                         progress_args=[ack_message.chat.id, ack_message.message_id],
                         thumb=temp_thumb
+                    )
+                    await MegaFiles().insert_new_files(
+                        filed_id=file_message.document.file_id,
+                        file_name=file_message.document.file_name,
+                        msg_id=file_message.message_id,
+                        chat_id=file_message.chat.id,
+                        file_type=file_message.document.mime_type,
+                        url=url
                     )
                 if os.path.exists(temp_thumb):
                     os.remove(temp_thumb)

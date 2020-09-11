@@ -43,6 +43,10 @@ Agenda:
 
 7. Moving the callback filters to regex:
     - Bug Fixes 🤷‍ I have no idea what else to call this [x]
-    with that lets conclude the video... basically lets take this as a pathway to custom filters which we will
-    also do within this project, however I do like these regex filters too, since they are simple and very
-    straight forward and easy,.... with that being said have a nice day ahead :-)
+
+8. Querying files already downloaded:
+    - saving file details to DB [x]
+    - telegram deep links (I guess thats what its called) [x]
+    well lets conclude todays video with that, I am not feeling very well today, twisted my ankle while playing
+    and I am in a lot of pain, just came to do a video... so that I dont let u guys down... have a nice day
+    ahead... :)

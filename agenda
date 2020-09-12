@@ -47,6 +47,10 @@ Agenda:
 8. Querying files already downloaded:
     - saving file details to DB [x]
     - telegram deep links (I guess thats what its called) [x]
-    well lets conclude todays video with that, I am not feeling very well today, twisted my ankle while playing
-    and I am in a lot of pain, just came to do a video... so that I dont let u guys down... have a nice day
-    ahead... :)
+
+9. Inline Queries for Querying files that are already downloaded:
+    - attending questions from tg group [x]
+    - introduction of dustbin [x]
+    - inline queries [x]
+    well that completes our agenda for today, and also completes the module file query that we had on megadlbot.
+    have a nice day ahead ... :-)

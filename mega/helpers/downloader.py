@@ -14,6 +14,7 @@ from pyrogram.types import Message
 from mega.telegram import MegaDLBot
 from mega.database.users import MegaUsers
 from mega.database.files import MegaFiles
+from mega.common import Common
 
 status_progress = {}
 
@@ -82,14 +83,7 @@ class Downloader:
                     progress_args=[ack_message.chat.id, ack_message.message_id]
                 )
 
-                await MegaFiles().insert_new_files(
-                    filed_id=file_message.document.file_id,
-                    file_name=file_message.document.file_name,
-                    msg_id=file_message.message_id,
-                    chat_id=file_message.chat.id,
-                    file_type=file_message.document.mime_type,
-                    url=url
-                )
+                await Downloader().send_file_to_dustbin(file_message, "doc", url)
 
             elif user_details['dld_settings'] == 'f-docs':
                 file_message = await MegaDLBot.send_document(
@@ -98,14 +92,7 @@ class Downloader:
                     progress=Downloader().upload_progress_hook,
                     progress_args=[ack_message.chat.id, ack_message.message_id]
                 )
-                await MegaFiles().insert_new_files(
-                    filed_id=file_message.document.file_id,
-                    file_name=file_message.document.file_name,
-                    msg_id=file_message.message_id,
-                    chat_id=file_message.chat.id,
-                    file_type=file_message.document.mime_type,
-                    url=url
-                )
+                await Downloader().send_file_to_dustbin(file_message, "doc", url)
             elif user_details['dld_settings'] == 'ct-docs':
                 temp_thumb = await Downloader().get_thumbnail(user_details['custom_thumbnail'])
                 file_message = await MegaDLBot.send_document(
@@ -115,14 +102,7 @@ class Downloader:
                     progress_args=[ack_message.chat.id, ack_message.message_id],
                     thumb=temp_thumb
                 )
-                await MegaFiles().insert_new_files(
-                    filed_id=file_message.document.file_id,
-                    file_name=file_message.document.file_name,
-                    msg_id=file_message.message_id,
-                    chat_id=file_message.chat.id,
-                    file_type=file_message.document.mime_type,
-                    url=url
-                )
+                await Downloader().send_file_to_dustbin(file_message, "doc", url)
 
                 if os.path.exists(temp_thumb):
                     os.remove(temp_thumb)
@@ -138,14 +118,7 @@ class Downloader:
                         progress_args=[ack_message.chat.id, ack_message.message_id],
                         thumb=temp_thumb
                     )
-                    await MegaFiles().insert_new_files(
-                        filed_id=file_message.video.file_id,
-                        file_name=file_message.video.file_name,
-                        msg_id=file_message.message_id,
-                        chat_id=file_message.chat.id,
-                        file_type=file_message.video.mime_type,
-                        url=url
-                    )
+                    await Downloader().send_file_to_dustbin(file_message, "video", url)
                 else:
                     file_message = await MegaDLBot.send_document(
                         chat_id=ack_message.chat.id,
@@ -154,14 +127,8 @@ class Downloader:
                         progress_args=[ack_message.chat.id, ack_message.message_id],
                         thumb=temp_thumb
                     )
-                    await MegaFiles().insert_new_files(
-                        filed_id=file_message.document.file_id,
-                        file_name=file_message.document.file_name,
-                        msg_id=file_message.message_id,
-                        chat_id=file_message.chat.id,
-                        file_type=file_message.document.mime_type,
-                        url=url
-                    )
+                    await Downloader().send_file_to_dustbin(file_message, "doc", url)
+
                 if os.path.exists(temp_thumb):
                     os.remove(temp_thumb)
 
@@ -177,6 +144,35 @@ class Downloader:
                     shutil.rmtree(os.path.dirname(temp_file))
                 except Exception as e:
                     logging.error(str(e))
+
+    @staticmethod
+    async def send_file_to_dustbin(file_message: Message, media_type: str, url: str):
+        if media_type == "video":
+            await file_message.forward(
+                chat_id=Common().bot_dustbin,
+                as_copy=True
+            )
+            await MegaFiles().insert_new_files(
+                filed_id=file_message.video.file_id,
+                file_name=file_message.video.file_name,
+                msg_id=file_message.message_id,
+                chat_id=file_message.chat.id,
+                file_type=file_message.video.mime_type,
+                url=url
+            )
+        else:
+            await file_message.forward(
+                chat_id=Common().bot_dustbin,
+                as_copy=True
+            )
+            await MegaFiles().insert_new_files(
+                filed_id=file_message.document.file_id,
+                file_name=file_message.document.file_name,
+                msg_id=file_message.message_id,
+                chat_id=file_message.chat.id,
+                file_type=file_message.document.mime_type,
+                url=url
+            )
 
     @staticmethod
     async def upload_progress_hook(current, total, chat_id, message_id):

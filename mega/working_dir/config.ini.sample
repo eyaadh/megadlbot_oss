@@ -6,8 +6,9 @@ root = mega/telegram/plugins
 [bot-configuration]
 api_key = 
 session = megadlbot
+dustbin = -1001179151275
 [database]
 db_host = localhost
 db_username = admin
 db_password = 
-db_name =
+db_name = megadlbot

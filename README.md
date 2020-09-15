@@ -38,8 +38,8 @@ service mongod restart
 ```
 
 ### Windows:
-a. Download the installer from [here](https://www.mongodb.com/try/download/community?tck=docs_server), and run it.
-b. Follow the MongoDB Community Edition installation wizard.
+a. Download the installer from [here](https://www.mongodb.com/try/download/community?tck=docs_server), and run it. \
+b. Follow the MongoDB Community Edition installation wizard. \
 c. Create a admin user and assign it roles:
 ```
 # I assume you had used the default location to install.
@@ -49,7 +49,7 @@ use admin
 db.createUser({user:"admin", pwd:"password", roles:[{role:"root", db:"admin"}]})
 exit
 ```
-d. Stop the Mongo `MongoDB Server (MongoDB)` service from services.msc.
+d. Stop the Mongo `MongoDB Server (MongoDB)` service from services.msc. \
 e. Edit the Yamal Config file - `mongodb.cfg` located at `C:\Program Files\MongoDB\Server\4.4\bin` with your favorite editor and add the following lines:
 ```
 security:
@@ -57,6 +57,6 @@ security:
 ```
 f. Save the file and close it, also start the `MongoDB Server (MongoDB)` service that we stopped at services.msc
 
-2. Installation of ffmpeg:
-a. Ubuntu: `apt install -y ffmpeg`.
+2. Installation of ffmpeg: \
+a. Ubuntu: `apt install -y ffmpeg`. \
 b. Windows: A full documentation of how to is [here](https://www.wikihow.com/Install-FFmpeg-on-Windows).

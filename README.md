@@ -16,6 +16,8 @@ The application makes use of [MongoDB](https://www.mongodb.com/) for its databas
 
 ## Cloning and running:
 1. Installation of DB
+
+---
 ### Ubuntu:
 ```
 sudo apt update
@@ -56,6 +58,9 @@ security:
   authorization: enabled
 ```
 f. Save the file and close it, also start the `MongoDB Server (MongoDB)` service that we stopped at services.msc
+
+---
+
 
 2. Installation of ffmpeg: \
 a. Ubuntu: `apt install -y ffmpeg`. \

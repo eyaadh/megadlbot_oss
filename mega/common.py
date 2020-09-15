@@ -6,8 +6,8 @@ class Common:
     def __init__(self):
         self.working_dir = "mega/working_dir"
 
-        is_env = bool(os.environ.get("ENV", None))
-        if is_env:
+        self.is_env = bool(os.environ.get("ENV", None))
+        if self.is_env:
             self.tg_app_id = int(os.environ.get("TG_APP_ID"))
             self.tg_api_key = os.environ.get("TG_API_HASH")
 

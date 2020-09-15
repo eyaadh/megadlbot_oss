@@ -112,5 +112,5 @@ db_name = megadlbot
 
 Before clicking the Deploy button make sure you have the following details with you too:
 1. Create a free account on cloud.mongodb.com (This is for the DB and you need its details for the config file as explained above, also keep a note that if you host mongoDB community edition on your own its totally free otherwise you might have limitations).
-2. Create a Telegram channel (This one for the dustbin. As mentioned above watch this video to understand what the dustbin is: https://www.youtube.com/watch?v=vgzMacnI5Z8)
+2. Create a Telegram channel (This one for the dustbin. As mentioned above watch this [video](https://www.youtube.com/watch?v=vgzMacnI5Z8) to understand what the dustbin is.)
 3. Well as obvious as it can be create a bot with @BotFather, also get your API ID and API Hash from my.telegram.org.  

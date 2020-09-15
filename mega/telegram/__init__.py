@@ -3,6 +3,8 @@ from mega.common import Common
 
 if Common().is_env:
     MegaDLBot = Client(
+        api_id=Common().tg_app_id
+        api_hash=Common().tg_api_key
         session_name=Common().bot_session,
         bot_token=Common().bot_api_key,
         workers=200,

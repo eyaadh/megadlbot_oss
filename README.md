@@ -60,3 +60,36 @@ f. Save the file and close it, also start the `MongoDB Server (MongoDB)` service
 2. Installation of ffmpeg: \
 a. Ubuntu: `apt install -y ffmpeg`. \
 b. Windows: A full documentation of how to is [here](https://www.wikihow.com/Install-FFmpeg-on-Windows).
+> Also I had shown this on my [video](https://www.youtube.com/watch?v=MMRtEvGpzdk)
+
+3. `https://github.com/eyaadh/megadlbot_oss.git`, to clone and the repository.
+4. `cd megadlbot/`, to enter the directory.
+5. `pip3 install -r requirements.txt`, to install python libraries/dependencies/requirements for the project.
+6. Create a new `config.ini` using the sample available at `mega/working_dir/config.ini.sample` at `mega/working_dir/`.
+```
+# Here is a sample of config file and what it should include:
+[pyrogram]
+# More info on API_ID and API_HASH can be found here: https://docs.pyrogram.org/intro/setup#api-keys
+api_id = 
+api_hash = 
+[plugins]
+root = mega/telegram/plugins
+[bot-configuration]
+# More info on Bot API Key/token can be found here: https://core.telegram.org/bots#6-botfather
+api_key = 
+session = megadlbot
+# Watch this video to understand what the dustbin is: https://www.youtube.com/watch?v=vgzMacnI5Z8
+dustbin = 
+[database]
+# In this section db_host is the address of the machine where the MongoDB is running, if you are running 
+# both the bot and Mongo on same machine leave it as local host.
+# db_username and db_password are the username and password we assigned roleas with at the first step 
+# while we installed Database
+db_host = localhost
+db_username = admin
+db_password = 
+db_name = megadlbot
+```
+7.  Run with `python3.8 -m mega`, stop with <kbd>CTRL</kbd>+<kbd>C</kbd>.
+> It is recommended to use [virtual environments](https://docs.python-guide.org/dev/virtualenvs/) while running the app, this is a good practice you can use at any of your python projects as virtualenv creates an isolated Python environment which is specific to your project.
+

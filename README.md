@@ -57,4 +57,6 @@ security:
 ```
 f. Save the file and close it, also start the `MongoDB Server (MongoDB)` service that we stopped at services.msc
 
-
+2. Installation of ffmpeg:
+a. Ubuntu: `apt install -y ffmpeg`.
+b. Windows: A full documentation of how to is [here](https://www.wikihow.com/Install-FFmpeg-on-Windows).

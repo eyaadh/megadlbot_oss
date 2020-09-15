@@ -70,7 +70,7 @@ b. Windows: A full documentation of how to is [here](https://www.wikihow.com/Ins
 ---
 
 3. `git clone https://github.com/eyaadh/megadlbot_oss.git`, to clone and the repository.
-4. `cd megadlbot/`, to enter the directory.
+4. `cd megadlbot_oss/`, to enter the directory.
 5. `pip3 install -r requirements.txt`, to install python libraries/dependencies/requirements for the project.
 
 ----

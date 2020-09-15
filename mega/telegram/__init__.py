@@ -9,7 +9,7 @@ if Common().is_env:
         bot_token=Common().bot_api_key,
         workers=200,
         workdir=Common().working_dir,
-        plugins=dict(root="mega/telegram/plugins")
+        plugins=dict(root="=telegram/plugins")
     )
 else:
     MegaDLBot = Client(

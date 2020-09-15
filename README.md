@@ -67,9 +67,13 @@ a. Ubuntu: `apt install -y ffmpeg`. \
 b. Windows: A full documentation of how to is [here](https://www.wikihow.com/Install-FFmpeg-on-Windows).
 > Also I had shown this on my [video](https://www.youtube.com/watch?v=MMRtEvGpzdk)
 
+---
+
 3. `https://github.com/eyaadh/megadlbot_oss.git`, to clone and the repository.
 4. `cd megadlbot/`, to enter the directory.
 5. `pip3 install -r requirements.txt`, to install python libraries/dependencies/requirements for the project.
+
+----
 6. Create a new `config.ini` using the sample available at `mega/working_dir/config.ini.sample` at `mega/working_dir/`.
 ```
 # Here is a sample of config file and what it should include:
@@ -95,6 +99,9 @@ db_username = admin
 db_password = 
 db_name = megadlbot
 ```
+
+---
+
 7.  Run with `python3.8 -m mega`, stop with <kbd>CTRL</kbd>+<kbd>C</kbd>.
 > It is recommended to use [virtual environments](https://docs.python-guide.org/dev/virtualenvs/) while running the app, this is a good practice you can use at any of your python projects as virtualenv creates an isolated Python environment which is specific to your project.
 

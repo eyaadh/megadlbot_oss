@@ -52,5 +52,18 @@ Agenda:
     - attending questions from tg group [x]
     - introduction of dustbin [x]
     - inline queries [x]
-    well that completes our agenda for today, and also completes the module file query that we had on megadlbot.
-    have a nice day ahead ... :-)
+
+10. Cloning and Deployment:
+Hello!!! its been a while, lets get started... today I am very excited... lemme show u why:
+a promise is a promise... I told u once I reach 100 subs I will share the source of the project on github
+also do a video with instructions on how to deploy it on your environment... well thats exactly what
+I am going to do,
+I have already got my testbench up and running on digital ocean... and its ubuntu... we had done the whole
+development on windows, and also I shared every step on how and what I did through out the whole series, so
+I believe I have already given u instructions on how it can be deployed on windows lol...
+ok without a further delay lets jump in to the agenda...
+
+there u go, the source is on github now, well what a messy video it has been... either way, with that being
+done, here we also found out that we do have to do a better system in handling floodwait, anyway this
+has been a good journey together, lets continue fix all that too... well for today lets conclude the video..
+have a nice day ahead :-)

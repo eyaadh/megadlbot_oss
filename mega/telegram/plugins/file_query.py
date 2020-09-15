@@ -2,7 +2,7 @@ from mega.telegram import MegaDLBot
 from mega.database.files import MegaFiles
 from pyrogram import emoji
 from pyrogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent, \
-    InlineKeyboardMarkup,InlineKeyboardButton
+    InlineKeyboardMarkup, InlineKeyboardButton
 
 
 @MegaDLBot.on_inline_query()

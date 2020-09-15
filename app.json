@@ -1,0 +1,61 @@
+{
+    "name": "MegaDLBot",
+    "description": "https://telegram.dog/MegaDLBot",
+    "keywords": [
+        "telegram",
+        "best",
+        "youtube",
+        "downloader",
+        "open",
+        "source",
+        "multi",
+        "purpose",
+        "ffmpeg",
+        "remote",
+        "uploader"
+    ],
+    "success_url": "https://telegram.dog/MegaDLBot",
+    "website": "https://github.com/eyaadh/megadlbot_oss",
+    "repository": "https://github.com/eyaadh/megadlbot_oss",
+    "env": {
+        "ENV": {
+            "description": "Setting this to ANYTHING will enable VARs when in ENV mode",
+            "value": "ANYTHING"
+        },
+        "TG_BOT_TOKEN": {
+            "description": "Your bot token, as a string."
+        },
+        "TG_APP_ID": {
+            "description": "Get this value from https://my.telegram.org"
+        },
+        "TG_API_HASH": {
+            "description": "Get this value from https://my.telegram.org"
+        },
+        "TG_DUSTBIN_CHAT": {
+            "description": "Watch this video to understand what the dustbin is: https://youtu.be/vgzMacnI5Z8"
+        },
+        "DATABASE_DB_HOST": {
+            "description": "Watch this video to understand what database is: https://youtu.be/vgzMacnI5Z8"
+        },
+        "DATABASE_DB_USERNAME": {
+            "description": "Watch this video to understand what database is: https://youtu.be/vgzMacnI5Z8"
+        },
+        "DATABASE_DB_PASSWORD": {
+            "description": "Watch this video to understand what database is: https://youtu.be/vgzMacnI5Z8"
+        },
+        "DATABASE_DB_NAME": {
+            "description": "Watch this video to understand what database is: https://youtu.be/vgzMacnI5Z8"
+        }
+    },
+    "buildpacks": [{
+        "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest"
+    }, {
+        "url": "heroku/python"
+    }],
+    "formation": {
+        "worker": {
+            "quantity": 1,
+            "size": "free"
+        }
+    }
+}

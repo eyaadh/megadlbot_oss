@@ -1,4 +1,4 @@
-# Megadlbot:
+# Megadlbot aka Megatron:
 Megatron was a telegram file management bot that helped a lot of users, specially movie channel managers to upload their files to telegram by just providing a link to it. The project initially started as roanuedhuru_bot which lately retired and came back as Megatron which was a side project of the famous Maldivian Telegram community - @Baivaru until it retired.
 
 Megatron is a project that is very close to my heart - me being the whole brain who developed it since the very beginning and as you are aware, for the cause of its life span the bot was never opensource unlike many other telegram bots which did a similar job. You had asked for its source for long enough I though I am not just going to give the source but build the whole thing from scratch at YouTube with you guys. 

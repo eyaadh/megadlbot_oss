@@ -5,7 +5,7 @@ Megatron is a project that is very close to my heart - me being the whole brain 
 
 > [Youtube Playlist](https://www.youtube.com/playlist?list=PLApP3aDELGhvQqPcA_DsTSt-sA0v2OkqP)
 
-## Important libraries used by the application and what they do:
+## Important libraries used by the application:
 1. [aiohttp](https://docs.aiohttp.org/en/latest/client.html)
 2. [aiofiles](https://github.com/mosquito/aiofile)
 3. [pymongo](https://github.com/mongodb/mongo-python-driver)

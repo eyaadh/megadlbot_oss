@@ -33,7 +33,7 @@ class Common:
             self.bot_api_key = self.app_config.get("bot-configuration", "api_key")
             self.bot_dustbin = int(self.app_config.get("bot-configuration", "dustbin"))
 
-            self.db_url = self.app_config.get("database", "db_url")
+            #self.db_url = self.app_config.get("database", "db_url")
             #self.db_host = self.app_config.get("database", "db_host")
             #self.db_username = self.app_config.get("database", "db_username")
             #self.db_password = self.app_config.get("database", "db_password")

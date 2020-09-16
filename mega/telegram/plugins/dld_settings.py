@@ -3,10 +3,11 @@ import os
 import secrets
 
 import aiofiles
-from pyrogram import emoji, filters, Client
+from pyrogram import emoji, Client
 from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, ForceReply
 
 from mega.database.users import MegaUsers
+from .. import filters
 
 
 @Client.on_message(filters.command("dldsettings", prefixes=["/"]))
@@ -28,7 +29,7 @@ async def dld_settings_handler(c: Client, m: Message):
     )
 
 
-@Client.on_callback_query(filters.regex("^dlsettings.*"), group=3)
+@Client.on_callback_query(filters.callback_query("dlsettings"), group=3)
 async def callback_query_dld_settings_handler(c: Client, cb: CallbackQuery):
     await cb.answer()
 
@@ -46,7 +47,7 @@ async def callback_query_dld_settings_handler(c: Client, cb: CallbackQuery):
     )
 
 
-@Client.on_callback_query(filters.regex("^thumbnail.*"), group=4)
+@Client.on_callback_query(filters.callback_query("thumbnail"), group=4)
 async def callback_query_thumbnail_handler(c: Client, cb: CallbackQuery):
     await cb.answer()
 
@@ -81,13 +82,13 @@ async def thumbnail_reply_msg_handler(c: Client, m: Message):
             )
 
 
-@Client.on_callback_query(filters.regex("f-docs"))
+@Client.on_callback_query(filters.callback_query("f-docs", payload=False))
 async def force_docs_cb_handler(c: Client, cb: CallbackQuery):
     await MegaUsers().update_dld_settings(cb.message.chat.id, "f-docs")
     await cb.answer("Your settings has been updated to Force Document")
 
 
-@Client.on_callback_query(filters.regex("ct-docs"))
+@Client.on_callback_query(filters.callback_query("ct-docs", payload=False))
 async def thumbnail_docs_cb_handler(c: Client, cb: CallbackQuery):
     user_details = await MegaUsers().get_user(cb.message.chat.id)
     if user_details['custom_thumbnail'] is None:
@@ -102,7 +103,7 @@ async def thumbnail_docs_cb_handler(c: Client, cb: CallbackQuery):
         await cb.answer("Your settings has been updated to Force Document w Thumbnail")
 
 
-@Client.on_callback_query(filters.regex("ct-videos"))
+@Client.on_callback_query(filters.callback_query("ct-videos", payload=False))
 async def ct_videos_cb_handler(c: Client, cb: CallbackQuery):
     user_details = await MegaUsers().get_user(cb.message.chat.id)
     if user_details['custom_thumbnail'] is None:

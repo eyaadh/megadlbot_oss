@@ -37,7 +37,8 @@ async def new_message_dl_handler(c: MegaDLBot, m: Message):
             await m.reply_text(
                 f"I also do have the following files that were uploaded earlier with the same url:\n"
                 f"{files_msg_formatted}",
-                disable_web_page_preview=True
+                disable_web_page_preview=True,
+                quote=True
             )
             await url_process(m)
 
@@ -48,13 +49,13 @@ async def url_process(m: Message):
     file_type_split = file_type_raw.split("/")[0]
     if not header_info:
         await m.reply_text(
-            f"I do not know the details of the file to download the file! {emoji.MAN_RAISING_HAND_DARK_SKIN_TONE}"
+            f"I do not know the details of the file to download the file! {emoji.MAN_RAISING_HAND_DARK_SKIN_TONE}", quote=True
         )
     elif header_info:
         file_size = header_info.get("Content-Length") if "Content-Length" in header_info else None
         if not file_size and int(file_size) > 2147483648:
             await m.reply_text(
-                f"Well that file is bigger than I can upload to telegram! {emoji.MAN_SHRUGGING_DARK_SKIN_TONE}"
+                f"Well that file is bigger than I can upload to telegram! {emoji.MAN_SHRUGGING_DARK_SKIN_TONE}", quote=True
             )
         else:
             inline_buttons = [
@@ -72,7 +73,8 @@ async def url_process(m: Message):
                 ])
             await m.reply_text(
                 text="What would you like to do with this file?",
-                reply_markup=InlineKeyboardMarkup(inline_buttons)
+                reply_markup=InlineKeyboardMarkup(inline_buttons),
+                quote=True
             )
 
 
@@ -88,7 +90,7 @@ async def callback_download_handler(c: MegaDLBot, cb: CallbackQuery):
     await cb.message.delete(True)
 
     ack_message = await cb_message.reply_text(
-        "About to start downloading the file to Local."
+        "About to start downloading the file to Local.", quote=True
     )
     await Downloader().download_file(cb_message.text, ack_message, None)
     

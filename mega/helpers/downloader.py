@@ -11,15 +11,19 @@ import mimetypes
 import urllib.parse
 import humanfriendly as size
 from pyrogram.types import Message
+from pyrogram import emoji
 from mega.telegram import MegaDLBot
 from mega.database.users import MegaUsers
 from mega.database.files import MegaFiles
 from mega.common import Common
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 status_progress = {}
 
 
 class Downloader:
+    cancelled = []
+    
     @staticmethod
     async def get_headers(url: str):
         async with aiohttp.ClientSession() as mega_session:
@@ -49,6 +53,14 @@ class Downloader:
                         "last_download_updated": time.time()
                     }
                     async for chunk in resp.content.iter_any():
+                        if ack_message.chat.id in Downloader().cancelled:
+                            await MegaDLBot.edit_message_text(
+                                chat_id=ack_message.chat.id,
+                                message_id=ack_message.message_id,
+                                text = "Cancelled successfully"
+                            )
+                            os.remove(temp_file)
+                            break
                         await dl_file.write(chunk)
                         dl_len += len(chunk)
                         if (time.time() - status_progress[
@@ -57,7 +69,12 @@ class Downloader:
                                 chat_id=ack_message.chat.id,
                                 message_id=ack_message.message_id,
                                 text=f"Downloading: {file_name} - {size.format_size(dl_len, binary=True)} of "
-                                     f"{size.format_size(int(resp.headers.get('Content-Length')), binary=True)}"
+                                     f"{size.format_size(int(resp.headers.get('Content-Length')), binary=True)}",
+                                reply_markup=InlineKeyboardMarkup(
+                                    [[ 
+                                       InlineKeyboardButton("cancel " + emoji.MULTIPLY,callback_data=f"cancel_process")
+                                    ]]
+                               )                         
                             )
 
                             status_progress[f"{ack_message.chat.id}{ack_message.message_id}"][
@@ -66,6 +83,8 @@ class Downloader:
 
     @staticmethod
     async def upload_file(temp_file: str, ack_message: Message, url: str):
+        if not os.path.isfile(temp_file):
+            return
         await MegaDLBot.edit_message_text(
             chat_id=ack_message.chat.id,
             message_id=ack_message.message_id,

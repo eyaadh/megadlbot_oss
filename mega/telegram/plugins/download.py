@@ -1,6 +1,6 @@
 import re
 import os
-from pyrogram import filters, emoji
+from pyrogram import Client, filters, emoji
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ForceReply
 from mega.telegram import MegaDLBot
 from mega.helpers.media_info import MediaInfo
@@ -9,7 +9,7 @@ from mega.database.users import MegaUsers
 from mega.database.files import MegaFiles
 
 
-@MegaDLBot.on_message(filters.private & filters.text, group=0)
+@Client.on_message(filters.private & filters.text, group=0)
 async def new_message_dl_handler(c: MegaDLBot, m: Message):
     await MegaUsers().insert_user(m.from_user.id)
 
@@ -27,11 +27,12 @@ async def new_message_dl_handler(c: MegaDLBot, m: Message):
             await url_process(m)
         else:
             url_details = await MegaFiles().get_file_by_url(m.text)
+            me = await c.get_users("me")
             files = [
-                f"<a href='http://t.me/megadlbot?start=plf-{file['file_id']}'>{file['file_name']} - {file['file_type']}</a>"
+                f"<a href='http://t.me/{me.username}?start=plf-{file['file_id']}'>{file['file_name']} - {file['file_type']}</a>"
                 for file in url_details
             ]
-            files_msg_formatted = '/n'.join(files)
+            files_msg_formatted = '\n'.join(files)
 
             await m.reply_text(
                 f"I also do have the following files that were uploaded earlier with the same url:\n"
@@ -45,14 +46,13 @@ async def url_process(m: Message):
     header_info = await Downloader.get_headers(m.text)
     file_type_raw = header_info.get("Content-Type") if "Content-Type" in header_info else "None/None"
     file_type_split = file_type_raw.split("/")[0]
-
-    if header_info is None:
+    if not header_info:
         await m.reply_text(
             f"I do not know the details of the file to download the file! {emoji.MAN_RAISING_HAND_DARK_SKIN_TONE}"
         )
-    elif header_info is not None:
+    elif header_info:
         file_size = header_info.get("Content-Length") if "Content-Length" in header_info else None
-        if file_size is not None and int(file_size) > 2147483648:
+        if not file_size and int(file_size) > 2147483648:
             await m.reply_text(
                 f"Well that file is bigger than I can upload to telegram! {emoji.MAN_SHRUGGING_DARK_SKIN_TONE}"
             )
@@ -76,7 +76,7 @@ async def url_process(m: Message):
             )
 
 
-@MegaDLBot.on_callback_query(filters.regex("^download.*"), group=0)
+@Client.on_callback_query(filters.regex("^download.*"), group=0)
 async def callback_download_handler(c: MegaDLBot, cb: CallbackQuery):
     cb_chat = int(str(cb.data).split("_")[1]) if len(str(cb.data).split("_")) > 1 else None
     cb_message_id = int(str(cb.data).split("_")[2]) if len(str(cb.data).split("_")) > 2 else None
@@ -88,11 +88,10 @@ async def callback_download_handler(c: MegaDLBot, cb: CallbackQuery):
     ack_message = await cb_message.reply_text(
         "About to start downloading the file to Local."
     )
-
     await Downloader().download_file(cb_message.text, ack_message, None)
+    
 
-
-@MegaDLBot.on_callback_query(filters.regex("^rename.*"), group=1)
+@Client.on_callback_query(filters.regex("^rename.*"), group=1)
 async def callback_rename_handler(c: MegaDLBot, cb: CallbackQuery):
     await cb.answer()
     cb_message_id = int(str(cb.data).split("_")[2]) if len(str(cb.data).split("_")) > 2 else None
@@ -103,7 +102,7 @@ async def callback_rename_handler(c: MegaDLBot, cb: CallbackQuery):
     )
 
 
-@MegaDLBot.on_callback_query(filters.regex("^info.*"), group=2)
+@Client.on_callback_query(filters.regex("^info.*"), group=2)
 async def callback_info_handler(c: MegaDLBot, cb: CallbackQuery):
     cb_chat = int(str(cb.data).split("_")[1]) if len(str(cb.data).split("_")) > 1 else None
     cb_message_id = int(str(cb.data).split("_")[2]) if len(str(cb.data).split("_")) > 2 else None
@@ -122,8 +121,12 @@ async def callback_info_handler(c: MegaDLBot, cb: CallbackQuery):
             if os.path.exists(m_info):
                 os.remove(m_info)
 
+@Client.on_callback_query(filters.regex("cancel_process"), group=3)
+async def cancel_download(c: MegaDLBot, cb: CallbackQuery):
+    Downloader().cancelled.append(cb.from_user.id)
+    await cb.answer("cancelling...")
 
-@MegaDLBot.on_message(filters.reply & filters.private, group=1)
+@Client.on_message(filters.reply & filters.private, group=1)
 async def reply_message_handler(c: MegaDLBot, m: Message):
     func_message_obj = str(m.reply_to_message.text).splitlines()[0].split("_")
     if len(func_message_obj) > 1:
@@ -136,5 +139,4 @@ async def reply_message_handler(c: MegaDLBot, m: Message):
             ack_message = await m.reply_text(
                 "About to start downloading the file to Local."
             )
-
             await Downloader().download_file(org_message.text, ack_message, new_file_name)

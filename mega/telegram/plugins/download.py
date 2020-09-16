@@ -1,11 +1,13 @@
-import re
 import os
-from pyrogram import filters, emoji, Client
+import re
+
+from pyrogram import emoji, Client
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ForceReply
-from mega.helpers.media_info import MediaInfo
-from mega.helpers.downloader import Downloader
-from mega.database.users import MegaUsers
+from .. import filters
 from mega.database.files import MegaFiles
+from mega.database.users import MegaUsers
+from mega.helpers.downloader import Downloader
+from mega.helpers.media_info import MediaInfo
 
 
 @Client.on_message(filters.private & filters.text, group=0)
@@ -77,10 +79,11 @@ async def url_process(m: Message):
             )
 
 
-@Client.on_callback_query(filters.regex("^download.*"), group=0)
+@Client.on_callback_query(filters.callback_query("download"), group=0)
 async def callback_download_handler(c: Client, cb: CallbackQuery):
-    cb_chat = int(str(cb.data).split("_")[1]) if len(str(cb.data).split("_")) > 1 else None
-    cb_message_id = int(str(cb.data).split("_")[2]) if len(str(cb.data).split("_")) > 2 else None
+    params = cb.payload.split('_')
+    cb_chat = int(params[0]) if len(params) > 0 else None
+    cb_message_id = int(params[1]) if len(params) > 1 else None
 
     cb_message = await c.get_messages(cb_chat, cb_message_id) if cb_message_id is not None else None
 
@@ -93,10 +96,13 @@ async def callback_download_handler(c: Client, cb: CallbackQuery):
     await Downloader().download_file(cb_message.text, ack_message, None)
 
 
-@Client.on_callback_query(filters.regex("^rename.*"), group=1)
+@Client.on_callback_query(filters.callback_query("rename"), group=1)
 async def callback_rename_handler(c: Client, cb: CallbackQuery):
     await cb.answer()
-    cb_message_id = int(str(cb.data).split("_")[2]) if len(str(cb.data).split("_")) > 2 else None
+
+    params = cb.payload.split('_')
+    cb_message_id = int(params[1]) if len(params) > 1 else None
+
     await cb.message.reply_text(
         f"RENAME_{cb_message_id}:\n"
         f"Send me the new name of the file as a reply to this message.",
@@ -104,10 +110,11 @@ async def callback_rename_handler(c: Client, cb: CallbackQuery):
     )
 
 
-@Client.on_callback_query(filters.regex("^info.*"), group=2)
+@Client.on_callback_query(filters.callback_query("info"), group=2)
 async def callback_info_handler(c: Client, cb: CallbackQuery):
-    cb_chat = int(str(cb.data).split("_")[1]) if len(str(cb.data).split("_")) > 1 else None
-    cb_message_id = int(str(cb.data).split("_")[2]) if len(str(cb.data).split("_")) > 2 else None
+    params = cb.payload.split('_')
+    cb_chat = int(params[0]) if len(params) > 0 else None
+    cb_message_id = int(params[1]) if len(params) > 1 else None
 
     await cb.answer()
     cb_message = await c.get_messages(cb_chat, cb_message_id) if cb_message_id is not None else None

@@ -1,7 +1,8 @@
-from mega.database.files import MegaFiles
 from pyrogram import emoji, Client
 from pyrogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent, \
     InlineKeyboardMarkup, InlineKeyboardButton
+
+from mega.database.files import MegaFiles
 
 
 @Client.on_inline_query()

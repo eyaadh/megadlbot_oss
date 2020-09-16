@@ -85,6 +85,8 @@ async def callback_download_handler(c: MegaDLBot, cb: CallbackQuery):
 
     await cb.answer()
 
+    await cb.message.delete(True)
+
     ack_message = await cb_message.reply_text(
         "About to start downloading the file to Local."
     )

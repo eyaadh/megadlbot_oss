@@ -59,6 +59,7 @@ class Downloader:
                                 message_id=ack_message.message_id,
                                 text = "Cancelled successfully"
                             )
+                            Downloader().cancelled.remove(ack_message.chat.id) # reset
                             os.remove(temp_file)
                             break
                         await dl_file.write(chunk)

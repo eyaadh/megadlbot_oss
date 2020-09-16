@@ -37,6 +37,6 @@ class Common:
             )
 
             self.db_host = self.app_config.get("database", "db_host")
-            self.db_username = self.app_config.get("database", "db_username")
-            self.db_password = self.app_config.get("database", "db_password")
+            self.db_username = self.app_config.get("database", "db_username", fallback=None)
+            self.db_password = self.app_config.get("database", "db_password", fallback=None)
             self.db_name = self.app_config.get("database", "db_name")

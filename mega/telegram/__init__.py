@@ -1,4 +1,5 @@
 from pyrogram import Client
+
 from mega.common import Common
 
 if Common().is_env:

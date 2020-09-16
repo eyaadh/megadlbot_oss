@@ -1,12 +1,16 @@
 [pyrogram]
 api_id = 
 api_hash = 
+
 [plugins]
 root = mega/telegram/plugins
+
 [bot-configuration]
 api_key = 
 session = megadlbot
 dustbin = -1001179151275
+allowed_users = [123123123, 321321321]
+
 [database]
 db_host = localhost
 db_username = admin

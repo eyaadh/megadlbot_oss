@@ -4,4 +4,4 @@
 *.ini
 *.cfg
 *.session
-*/__pycache__/
+__pycache__/

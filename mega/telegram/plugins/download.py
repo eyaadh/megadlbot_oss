@@ -114,7 +114,8 @@ async def callback_info_handler(c: MegaDLBot, cb: CallbackQuery):
     cb_message_id = int(str(cb.data).split("_")[2]) if len(str(cb.data).split("_")) > 2 else None
 
     await cb.answer()
-    await cb.message.delete(True)
+    await cb.edit_message_text('Processing..')
+    #await cb.message.delete(True)
     cb_message = await c.get_messages(cb_chat, cb_message_id) if cb_message_id is not None else None
     m_info, neko_link = await MediaInfo().get_media_info(cb_message.text)
     if m_info:

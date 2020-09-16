@@ -98,7 +98,6 @@ async def callback_download_handler(c: MegaDLBot, cb: CallbackQuery):
 @Client.on_callback_query(filters.regex("^rename.*"), group=1)
 async def callback_rename_handler(c: MegaDLBot, cb: CallbackQuery):
     await cb.answer()
-    await cb.message.delete(True)
     cb_message_id = int(str(cb.data).split("_")[2]) if len(str(cb.data).split("_")) > 2 else None
     await cb.message.reply_text(
         f"RENAME_{cb_message_id}:\n"
@@ -106,6 +105,7 @@ async def callback_rename_handler(c: MegaDLBot, cb: CallbackQuery):
         reply_markup=ForceReply(True),
         quote=True
     )
+    await cb.message.delete(True)
 
 
 @Client.on_callback_query(filters.regex("^info.*"), group=2)

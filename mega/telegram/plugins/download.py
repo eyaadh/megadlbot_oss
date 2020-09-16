@@ -36,7 +36,8 @@ async def new_message_dl_handler(c: MegaDLBot, m: Message):
             await m.reply_text(
                 f"I also do have the following files that were uploaded earlier with the same url:\n"
                 f"{files_msg_formatted}",
-                disable_web_page_preview=True
+                disable_web_page_preview=True,
+                quote=True
             )
             await url_process(m)
 
@@ -72,7 +73,8 @@ async def url_process(m: Message):
                 ])
             await m.reply_text(
                 text="What would you like to do with this file?",
-                reply_markup=InlineKeyboardMarkup(inline_buttons)
+                reply_markup=InlineKeyboardMarkup(inline_buttons),
+                quote=True
             )
 
 

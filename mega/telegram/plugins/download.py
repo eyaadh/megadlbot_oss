@@ -97,11 +97,13 @@ async def callback_download_handler(c: MegaDLBot, cb: CallbackQuery):
 async def callback_rename_handler(c: MegaDLBot, cb: CallbackQuery):
     await cb.answer()
     cb_message_id = int(str(cb.data).split("_")[2]) if len(str(cb.data).split("_")) > 2 else None
-    await cb.edit_message_text(
+    await cb.message.reply_text(
         f"RENAME_{cb_message_id}:\n"
         f"Send me the new name of the file as a reply to this message.",
-        reply_markup=ForceReply(True)
+        reply_markup=ForceReply(True),
+        quote=True
     )
+    await cb.message.delete(true)
 
 @Client.on_callback_query(filters.regex("^info.*"), group=2)
 async def callback_info_handler(c: MegaDLBot, cb: CallbackQuery):
@@ -109,7 +111,7 @@ async def callback_info_handler(c: MegaDLBot, cb: CallbackQuery):
     cb_message_id = int(str(cb.data).split("_")[2]) if len(str(cb.data).split("_")) > 2 else None
 
     await cb.answer()
-    await cb.edit_message_text('Processing..')
+    out = await cb.edit_message_text('Processing..')
     cb_message = await c.get_messages(cb_chat, cb_message_id) if cb_message_id is not None else None
     m_info, neko_link = await MediaInfo().get_media_info(cb_message.text)
     if m_info:
@@ -120,6 +122,7 @@ async def callback_info_handler(c: MegaDLBot, cb: CallbackQuery):
                 document=m_info,
                 quote=True
             )
+            await out.delete()
         finally:
             if os.path.exists(m_info):
                 os.remove(m_info)

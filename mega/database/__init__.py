@@ -1,4 +1,7 @@
+from urllib.parse import quote
+
 import pymongo
+
 from mega.common import Common
 
 
@@ -8,7 +11,7 @@ class MegaDB:
         DB_PASSWORD = Common().db_password
 
         if DB_USERNAME and DB_PASSWORD:
-            connection_string = f"mongodb://{Common().db_username}:{Common().db_password}@{Common().db_host}"
+            connection_string = f"mongodb://{Common().db_username}:{quote(Common().db_password)}@{Common().db_host}"
             self.db_client = pymongo.MongoClient(
                 connection_string
             )

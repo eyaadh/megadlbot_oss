@@ -34,13 +34,7 @@
         "TG_DUSTBIN_CHAT": {
             "description": "Watch this video to understand what the dustbin is: https://youtu.be/vgzMacnI5Z8"
         },
-        "DATABASE_DB_HOST": {
-            "description": "Watch this video to understand what database is: https://youtu.be/vgzMacnI5Z8"
-        },
-        "DATABASE_DB_USERNAME": {
-            "description": "Watch this video to understand what database is: https://youtu.be/vgzMacnI5Z8"
-        },
-        "DATABASE_DB_PASSWORD": {
+        "DATABASE_URL": {
             "description": "Watch this video to understand what database is: https://youtu.be/vgzMacnI5Z8"
         },
         "DATABASE_DB_NAME": {

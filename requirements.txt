@@ -14,3 +14,4 @@ Pyrogram==1.0.6
 PySocks==1.7.1
 TgCrypto==1.2.0
 yarl==1.5.1
+dnspython==1.16.0

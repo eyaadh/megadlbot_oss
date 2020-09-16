@@ -15,6 +15,9 @@ class Common:
             self.bot_session = ":memory:"
             self.bot_api_key = os.environ.get("TG_BOT_TOKEN")
             self.bot_dustbin = int(os.environ.get("TG_DUSTBIN_CHAT", "-100"))
+            self.allowed_users = ast.literal_eval(
+                os.environ.get("ALLOWED_USERS", '[]')
+            )
 
             self.db_host = os.environ.get("DATABASE_DB_HOST")
             self.db_username = os.environ.get("DATABASE_DB_USERNAME")

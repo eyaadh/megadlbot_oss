@@ -1,11 +1,10 @@
-from pyrogram import filters, emoji
+from pyrogram import filters, emoji, Client
 from pyrogram.types import Message
-from mega.telegram import MegaDLBot
 from mega.database.files import MegaFiles
 
 
-@MegaDLBot.on_message(filters.command("start", prefixes=["/"]))
-async def start_message_handler(c: MegaDLBot, m: Message):
+@Client.on_message(filters.command("start", prefixes=["/"]))
+async def start_message_handler(c: Client, m: Message):
     if len(m.command) > 1:
         if m.command[1].split("-")[0] == 'plf':
             file_id = m.command[1].split("-", 1)[1]

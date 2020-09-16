@@ -103,7 +103,7 @@ async def callback_rename_handler(c: MegaDLBot, cb: CallbackQuery):
         reply_markup=ForceReply(True),
         quote=True
     )
-    await cb.message.delete(true)
+    await cb.message.delete(True)
 
 @Client.on_callback_query(filters.regex("^info.*"), group=2)
 async def callback_info_handler(c: MegaDLBot, cb: CallbackQuery):

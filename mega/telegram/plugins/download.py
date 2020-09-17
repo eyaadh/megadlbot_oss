@@ -72,9 +72,7 @@ async def url_process(m: Message):
             if file_type_split.lower() == "video":
                 inline_buttons.append([
                     InlineKeyboardButton(text=f"{emoji.LIGHT_BULB} Media Info",
-                                         callback_data=f"info_{m.chat.id}_{m.message_id}")
-                ])
-                inline_buttons.append([
+                                         callback_data=f"info_{m.chat.id}_{m.message_id}"),
                     InlineKeyboardButton(text=f"{emoji.FRAMED_PICTURE} Screens",
                                          callback_data=f"screens_{m.chat.id}_{m.message_id}")
                 ])

@@ -18,7 +18,7 @@ class Screens:
         process = await asyncio.create_subprocess_exec(*duration_process_cmd, stdout=asyncio.subprocess.PIPE,
                                                        stderr=asyncio.subprocess.PIPE)
 
-        duration, err = await process.communicate()
+        duration, _ = await process.communicate()
 
         duration_int = int(float(duration.decode("utf-8").rstrip()))
 

@@ -8,6 +8,7 @@ from mega.database.files import MegaFiles
 from mega.database.users import MegaUsers
 from mega.helpers.downloader import Downloader
 from mega.helpers.media_info import MediaInfo
+from mega.helpers.screens import Screens
 
 
 @Client.on_message(filters.private & filters.text, group=0)
@@ -73,6 +74,10 @@ async def url_process(m: Message):
                     InlineKeyboardButton(text=f"{emoji.LIGHT_BULB} Media Info",
                                          callback_data=f"info_{m.chat.id}_{m.message_id}")
                 ])
+                inline_buttons.append([
+                    InlineKeyboardButton(text=f"{emoji.FRAMED_PICTURE} Screens",
+                                         callback_data=f"screens_{m.chat.id}_{m.message_id}")
+                ])
             await m.reply_text(
                 text="What would you like to do with this file?",
                 reply_markup=InlineKeyboardMarkup(inline_buttons)
@@ -94,6 +99,17 @@ async def callback_download_handler(c: Client, cb: CallbackQuery):
     )
 
     await Downloader().download_file(cb_message.text, ack_message, None)
+
+
+@Client.on_callback_query(filters.callback_query("screens"), group=0)
+async def callback_screens_handler(c: Client, cb: CallbackQuery):
+    params = cb.payload.split('_')
+    cb_chat = int(params[0]) if len(params) > 0 else None
+    cb_message_id = int(params[1]) if len(params) > 1 else None
+
+    cb_message = await c.get_messages(cb_chat, cb_message_id) if cb_message_id is not None else None
+    await Screens().cap_screens(cb_message)
+    # i think that should do... lets check?
 
 
 @Client.on_callback_query(filters.callback_query("rename"), group=1)

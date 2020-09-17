@@ -1,15 +1,17 @@
-import os
 import base64
-import aiofiles
+import os
 import secrets
-from pyrogram import emoji, filters
+
+import aiofiles
+from pyrogram import emoji, Client
 from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, ForceReply
-from mega.telegram import MegaDLBot
+
 from mega.database.users import MegaUsers
+from .. import filters
 
 
-@MegaDLBot.on_message(filters.command("dldsettings", prefixes=["/"]))
-async def dld_settings_handler(c: MegaDLBot, m: Message):
+@Client.on_message(filters.command("dldsettings", prefixes=["/"]))
+async def dld_settings_handler(c: Client, m: Message):
     user_details = await MegaUsers().get_user(m.from_user.id)
     await m.reply_text(
         f"Your Current Settings are: \n"
@@ -27,8 +29,8 @@ async def dld_settings_handler(c: MegaDLBot, m: Message):
     )
 
 
-@MegaDLBot.on_callback_query(filters.regex("^dlsettings.*"), group=3)
-async def callback_query_dld_settings_handler(c: MegaDLBot, cb: CallbackQuery):
+@Client.on_callback_query(filters.callback_query("dlsettings"), group=3)
+async def callback_query_dld_settings_handler(c: Client, cb: CallbackQuery):
     await cb.answer()
 
     await cb.message.edit_reply_markup(
@@ -45,8 +47,8 @@ async def callback_query_dld_settings_handler(c: MegaDLBot, cb: CallbackQuery):
     )
 
 
-@MegaDLBot.on_callback_query(filters.regex("^thumbnail.*"), group=4)
-async def callback_query_thumbnail_handler(c: MegaDLBot, cb: CallbackQuery):
+@Client.on_callback_query(filters.callback_query("thumbnail"), group=4)
+async def callback_query_thumbnail_handler(c: Client, cb: CallbackQuery):
     await cb.answer()
 
     await cb.message.reply_text(
@@ -57,8 +59,8 @@ async def callback_query_thumbnail_handler(c: MegaDLBot, cb: CallbackQuery):
     )
 
 
-@MegaDLBot.on_message(filters.reply & filters.private & filters.photo, group=2)
-async def thumbnail_reply_msg_handler(c: MegaDLBot, m: Message):
+@Client.on_message(filters.reply & filters.private & filters.photo, group=2)
+async def thumbnail_reply_msg_handler(c: Client, m: Message):
     func_message_obj = str(m.reply_to_message.text).splitlines()[0].split("_")
     temp_img_file = f"working_dir/{secrets.token_hex(2)}.jpg"
 
@@ -80,17 +82,17 @@ async def thumbnail_reply_msg_handler(c: MegaDLBot, m: Message):
             )
 
 
-@MegaDLBot.on_callback_query(filters.regex("f-docs"))
-async def force_docs_cb_handler(c: MegaDLBot, cb: CallbackQuery):
+@Client.on_callback_query(filters.callback_query("f-docs", payload=False))
+async def force_docs_cb_handler(c: Client, cb: CallbackQuery):
     await MegaUsers().update_dld_settings(cb.message.chat.id, "f-docs")
     await cb.answer("Your settings has been updated to Force Document")
 
 
-@MegaDLBot.on_callback_query(filters.regex("ct-docs"))
-async def thumbnail_docs_cb_handler(c: MegaDLBot, cb: CallbackQuery):
+@Client.on_callback_query(filters.callback_query("ct-docs", payload=False))
+async def thumbnail_docs_cb_handler(c: Client, cb: CallbackQuery):
     user_details = await MegaUsers().get_user(cb.message.chat.id)
     if user_details['custom_thumbnail'] is None:
-        await MegaDLBot.send_message(
+        await c.send_message(
             chat_id=cb.message.chat.id,
             text="You cannot set your settings to Force Document w Thumbnail while you haven't told me the "
                  "Thumbnail I should use! Set a Custom Thumbnail via settings first!!!"
@@ -101,11 +103,11 @@ async def thumbnail_docs_cb_handler(c: MegaDLBot, cb: CallbackQuery):
         await cb.answer("Your settings has been updated to Force Document w Thumbnail")
 
 
-@MegaDLBot.on_callback_query(filters.regex("ct-videos"))
-async def ct_videos_cb_handler(c: MegaDLBot, cb: CallbackQuery):
+@Client.on_callback_query(filters.callback_query("ct-videos", payload=False))
+async def ct_videos_cb_handler(c: Client, cb: CallbackQuery):
     user_details = await MegaUsers().get_user(cb.message.chat.id)
     if user_details['custom_thumbnail'] is None:
-        await MegaDLBot.send_message(
+        await c.send_message(
             chat_id=cb.message.chat.id,
             text="You cannot set your settings to Video w Thumbnail while you haven't told me the "
                  "Thumbnail I should use! Set a Custom Thumbnail via settings first!!!"
@@ -114,4 +116,3 @@ async def ct_videos_cb_handler(c: MegaDLBot, cb: CallbackQuery):
     else:
         await MegaUsers().update_dld_settings(cb.message.chat.id, "ct-videos")
         await cb.answer("Your settings has been updated to Video w Thumbnail")
-

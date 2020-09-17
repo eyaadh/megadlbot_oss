@@ -1,15 +1,15 @@
-from mega.telegram import MegaDLBot
-from mega.database.files import MegaFiles
-from pyrogram import emoji
+from pyrogram import emoji, Client
 from pyrogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent, \
     InlineKeyboardMarkup, InlineKeyboardButton
 
+from mega.database.files import MegaFiles
 
-@MegaDLBot.on_inline_query()
-async def inline_query_handler(c: MegaDLBot, iq: InlineQuery):
+
+@Client.on_inline_query()
+async def inline_query_handler(c: Client, iq: InlineQuery):
     q = iq.query
     q_res_data = await MegaFiles().get_file_by_name(q)
-
+    me = await c.get_me()
     res = []
     if q_res_data is not None:
         for file in q_res_data:
@@ -25,7 +25,7 @@ async def inline_query_handler(c: MegaDLBot, iq: InlineQuery):
                     reply_markup=InlineKeyboardMarkup(
                         [
                             [InlineKeyboardButton(text=f"{emoji.OPEN_MAILBOX_WITH_LOWERED_FLAG} Get this File",
-                                                  url=f"http://t.me/megadlbot?start=plf-{file['file_id']}")]
+                                                  url=f"http://t.me/{me.username}?start=plf-{file['file_id']}")]
                         ]
                     )
                 )

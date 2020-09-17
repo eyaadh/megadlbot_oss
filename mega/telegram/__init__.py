@@ -1,4 +1,5 @@
 from pyrogram import Client
+from .utils import filters
 from mega.common import Common
 
 if Common().is_env:
@@ -9,7 +10,7 @@ if Common().is_env:
         bot_token=Common().bot_api_key,
         workers=200,
         workdir=Common().working_dir,
-        plugins=dict(root="telegram/plugins")
+        plugins=dict(root="mega/telegram/plugins")
     )
 else:
     MegaDLBot = Client(

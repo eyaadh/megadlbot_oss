@@ -182,6 +182,8 @@ class Downloader:
                 message_id=message_id,
                 text=f"Uploading - {size.format_size(current, binary=True)} of {size.format_size(total, binary=True)}"
             )
+            status_progress[f"{chat_id}{message_id}"][
+                "last_upload_updated"] = time.time()
 
     @staticmethod
     async def get_thumbnail(data: bytes):

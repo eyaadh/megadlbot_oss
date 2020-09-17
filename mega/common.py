@@ -1,3 +1,4 @@
+import ast
 import configparser
 import os
 
@@ -14,6 +15,9 @@ class Common:
             self.bot_session = ":memory:"
             self.bot_api_key = os.environ.get("TG_BOT_TOKEN")
             self.bot_dustbin = int(os.environ.get("TG_DUSTBIN_CHAT", "-100"))
+            self.allowed_users = ast.literal_eval(
+                os.environ.get("ALLOWED_USERS", '[]')
+            )
 
             self.db_host = os.environ.get("DATABASE_DB_HOST")
             self.db_username = os.environ.get("DATABASE_DB_USERNAME")
@@ -31,8 +35,11 @@ class Common:
             self.bot_session = self.app_config.get("bot-configuration", "session")
             self.bot_api_key = self.app_config.get("bot-configuration", "api_key")
             self.bot_dustbin = int(self.app_config.get("bot-configuration", "dustbin"))
+            self.allowed_users = ast.literal_eval(
+                self.app_config.get("bot-configuration", "allowed_users", fallback='[]')
+            )
 
             self.db_host = self.app_config.get("database", "db_host")
-            self.db_username = self.app_config.get("database", "db_username")
-            self.db_password = self.app_config.get("database", "db_password")
+            self.db_username = self.app_config.get("database", "db_username", fallback=None)
+            self.db_password = self.app_config.get("database", "db_password", fallback=None)
             self.db_name = self.app_config.get("database", "db_name")

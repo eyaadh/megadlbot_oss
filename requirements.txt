@@ -3,7 +3,9 @@ aiohttp==3.6.2
 async-lru==1.0.2
 async-timeout==3.0.1
 attrs==20.1.0
+certifi==2020.6.20
 chardet==3.0.4
+dnspython==1.16.0
 humanfriendly==8.2
 idna==2.10
 multidict==4.7.6
@@ -12,6 +14,11 @@ pymongo==3.11.0
 pyreadline==2.1
 Pyrogram==1.0.6
 PySocks==1.7.1
+requests==2.24.0
+requests-file==1.5.1
+six==1.15.0
 TgCrypto==1.2.0
+tldextract==2.2.3
+urllib3==1.25.10
 yarl==1.5.1
-dnspython==1.16.0
+youtube-dl==2020.9.14

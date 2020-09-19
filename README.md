@@ -81,14 +81,19 @@ b. Windows: A full documentation of how to is [here](https://www.wikihow.com/Ins
 # More info on API_ID and API_HASH can be found here: https://docs.pyrogram.org/intro/setup#api-keys
 api_id = 
 api_hash = 
+
 [plugins]
 root = mega/telegram/plugins
+
 [bot-configuration]
 # More info on Bot API Key/token can be found here: https://core.telegram.org/bots#6-botfather
 api_key = 
 session = megadlbot
 # Watch this video to understand what the dustbin is: https://www.youtube.com/watch?v=vgzMacnI5Z8
 dustbin = 
+allowed_users = [123123123, 321321321]
+# a list of user ids who are allowed to use this bot
+
 [database]
 # In this section db_host is the address of the machine where the MongoDB is running, if you are running 
 # both the bot and Mongo on same machine leave it as local host.

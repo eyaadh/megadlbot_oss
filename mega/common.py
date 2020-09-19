@@ -19,7 +19,7 @@ class Common:
                 os.environ.get("ALLOWED_USERS", '[]')
             )
 
-            self.is_atlas = os.environ.get('IS_ATLAS', False)
+            self.is_atlas = os.environ.get('IS_ATLAS', None)
             self.db_host = os.environ.get("DATABASE_DB_HOST")
             self.db_username = os.environ.get("DATABASE_DB_USERNAME")
             self.db_password = os.environ.get("DATABASE_DB_PASSWORD")

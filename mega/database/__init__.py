@@ -7,19 +7,15 @@ from mega.common import Common
 
 class MegaDB:
     def __init__(self):
-        DB_USERNAME = Common().db_username
-        DB_PASSWORD = Common().db_password
-
-        if DB_USERNAME and DB_PASSWORD:
-            connection_string = f"mongodb://{Common().db_username}:{quote(Common().db_password)}@{Common().db_host}"
+        if Common().is_atlas:
             self.db_client = pymongo.MongoClient(
-                connection_string
+                Common().db_host,
             )
         else:
             self.db_client = pymongo.MongoClient(
                 Common().db_host,
-                username=DB_USERNAME,
-                password=DB_PASSWORD
+                username=Common().db_username,
+                password=Common().db_password
             )
 
         self.db = self.db_client[Common().db_name]

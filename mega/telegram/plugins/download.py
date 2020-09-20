@@ -1,6 +1,6 @@
 import os
 import re
-
+import tldextract
 from pyrogram import emoji, Client
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ForceReply
 from .. import filters
@@ -9,6 +9,7 @@ from mega.database.users import MegaUsers
 from mega.helpers.downloader import Downloader
 from mega.helpers.media_info import MediaInfo
 from mega.helpers.screens import Screens
+from mega.helpers.ytdl import YTdl
 
 
 @Client.on_message(filters.private & filters.text, group=0)
@@ -54,7 +55,7 @@ async def url_process(m: Message):
         await m.reply_text(
             f"I do not know the details of the file to download the file! {emoji.MAN_RAISING_HAND_DARK_SKIN_TONE}"
         )
-    elif header_info is not None:
+    elif header_info is not None and (tldextract.extract(m.text)).domain != "youtube":
         file_size = header_info.get("Content-Length") if "Content-Length" in header_info else None
         if file_size is not None and int(file_size) > 2147483648:
             await m.reply_text(
@@ -80,6 +81,30 @@ async def url_process(m: Message):
                 text="What would you like to do with this file?",
                 reply_markup=InlineKeyboardMarkup(inline_buttons)
             )
+
+    elif (tldextract.extract(m.text)).domain == "youtube":
+        inline_buttons = [
+            [
+                InlineKeyboardButton(text=f"{emoji.LOUDSPEAKER} Extract Audio",
+                                     callback_data=f"ytaudio_{m.chat.id}_{m.message_id}"),
+            ]
+        ]
+        await m.reply_text(
+            text="What would you like to do with this file?",
+            reply_markup=InlineKeyboardMarkup(inline_buttons)
+        )
+
+
+@Client.on_callback_query(filters.callback_query("ytaudio"), group=0)
+async def callback_ytaudio_handler(c: Client, cb: CallbackQuery):
+    params = cb.payload.split('_')
+    cb_chat = int(params[0]) if len(params) > 0 else None
+    cb_message_id = int(params[1]) if len(params) > 1 else None
+
+    cb_message = await c.get_messages(cb_chat, cb_message_id) if cb_message_id is not None else None
+
+    await cb.answer()
+    await YTdl().extract_audio(cb_message)
 
 
 @Client.on_callback_query(filters.callback_query("download"), group=0)

@@ -1,9 +1,11 @@
 import os
+import json
 import secrets
 import youtube_dl
 from mega.common import Common
 from pyrogram.types import Message
 from mega.helpers.uploader import UploadFiles
+from mega.helpers.nekofy import Nekobin
 
 
 class YTdl:
@@ -32,3 +34,14 @@ class YTdl:
             ydl.download([msg.text])
 
         await UploadFiles().upload_file(temp_file, ack_message, msg.text)
+
+    @staticmethod
+    async def yt_media_info(msg: Message):
+        ytdl_options = {}
+
+        with youtube_dl.YoutubeDL(ytdl_options) as ydl:
+            video_info = ydl.extract_info(url=msg.text, download=False)
+
+        neko_link = await Nekobin().nekofy(str(json.dumps(video_info, indent=2)))
+
+        return neko_link

@@ -3,14 +3,14 @@ import json
 import asyncio
 import secrets
 import aiofiles
-import aiohttp
 from mega.common import Common
+from mega.helpers.nekofy import Nekobin
 
 
 class MediaInfo:
     @staticmethod
     async def get_media_info(file: str):
-        neko_endpoint = "https://nekobin.com/api/documents"
+
         process_cmd = ["ffprobe", "-v", "quiet", "-print_format", "json", "-show_format", "-show_streams", file]
         process = await asyncio.create_subprocess_exec(*process_cmd, stdout=asyncio.subprocess.PIPE,
                                                        stderr=asyncio.subprocess.PIPE)
@@ -25,11 +25,6 @@ class MediaInfo:
             async with aiofiles.open(temp_file, mode="w") as m_file:
                 await m_file.write(str(json.dumps(m_info, indent=2)))
 
-            neko_link = ""
-
-            async with aiohttp.ClientSession() as nekoSession:
-                payload = {"content": str(json.dumps(m_info, indent=2))}
-                async with nekoSession.post(neko_endpoint, data=payload) as resp:
-                    neko_link = f"https://nekobin.com/{(await resp.json())['result']['key']}.py"
+            neko_link = await Nekobin().nekofy(str(json.dumps(m_info, indent=2)))
 
         return temp_file, neko_link

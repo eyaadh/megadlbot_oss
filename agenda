@@ -62,9 +62,20 @@ Agenda:
 13. Screens:
 
 14: introduction of YTDL:
-with that being said, we are also concluding our video!!!... see ya next time with some improvements to
-YTDL hopefully... or may be otherwise... well have a nice day... may god bless u I mean :)
     - Moving uploading files to its own module [x]
     - Attending a GitHub raised issue [x]
     - Introduction to Youtube-dl (extracting audio) [x]
+
+15. Deployment to Heroku - the recommended way, getting media info of YT Links:
+gosh!!! that worked on first run, well today is a very good day that means... perfect...
+well a lot of you have had a lot of questions about deploying the source on heroku, as I mentioned
+earlier when I started with this development never actually focused on keeping it heroku bug free
+but as the demand says and yet megadlbot being a community project we tend to listen, and here is
+a demonstration by our guest of honor today... well guys I present you uaudit... our very good friend
+and has always been one of the very energetic contributors at our community... let me hand over the control
+to him...
+    - audio files to be always uploaded as audio, despite which ever setting [x]
+    - Creating a module called nekofy [x]
+    - generating media info from YT Links [x]
+    - Demonstration of deployment to heroku the recommended way [x]
 

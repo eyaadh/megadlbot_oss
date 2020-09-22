@@ -87,6 +87,8 @@ async def url_process(m: Message):
             [
                 InlineKeyboardButton(text=f"{emoji.LOUDSPEAKER} Extract Audio",
                                      callback_data=f"ytaudio_{m.chat.id}_{m.message_id}"),
+                InlineKeyboardButton(text=f"{emoji.LIGHT_BULB} Media Info",
+                                     callback_data=f"ytmd_{m.chat.id}_{m.message_id}")
             ]
         ]
         await m.reply_text(
@@ -105,6 +107,23 @@ async def callback_ytaudio_handler(c: Client, cb: CallbackQuery):
 
     await cb.answer()
     await YTdl().extract_audio(cb_message)
+
+
+@Client.on_callback_query(filters.callback_query("ytmd"), group=0)
+async def callback_ytmd_handler(c: Client, cb: CallbackQuery):
+    params = cb.payload.split('_')
+    cb_chat = int(params[0]) if len(params) > 0 else None
+    cb_message_id = int(params[1]) if len(params) > 1 else None
+
+    cb_message = await c.get_messages(cb_chat, cb_message_id) if cb_message_id is not None else None
+
+    await cb.answer()
+    video_info = await YTdl().yt_media_info(cb_message)
+
+    await cb_message.reply_text(
+        "Here is the Media Info you requested: \n"
+        f"{emoji.CAT} View on nekobin.com: {video_info}"
+    )
 
 
 @Client.on_callback_query(filters.callback_query("download"), group=0)

@@ -21,6 +21,7 @@ status_progress = {}
 class UploadFiles:
     @staticmethod
     async def upload_file(temp_file: str, ack_message: Message, url: str):
+        file_type = mimetypes.guess_type(temp_file)
         await MegaDLBot.edit_message_text(
             chat_id=ack_message.chat.id,
             message_id=ack_message.message_id,
@@ -30,38 +31,68 @@ class UploadFiles:
         try:
             user_details = await MegaUsers().get_user(ack_message.chat.id)
             if user_details['dld_settings'] == 'default':
-                file_message = await MegaDLBot.send_document(
-                    chat_id=ack_message.chat.id,
-                    document=temp_file,
-                    progress=UploadFiles().upload_progress_hook,
-                    progress_args=[ack_message.chat.id, ack_message.message_id]
-                )
+                if str(file_type[0]).split("/")[0].lower() == "audio":
+                    file_message = await MegaDLBot.send_audio(
+                        chat_id=ack_message.chat.id,
+                        audio=temp_file,
+                        progress=UploadFiles().upload_progress_hook,
+                        progress_args=[ack_message.chat.id, ack_message.message_id]
+                    )
 
-                await UploadFiles().send_file_to_dustbin(file_message, "doc", url)
+                    await UploadFiles().send_file_to_dustbin(file_message, "audio", url)
+                else:
+                    file_message = await MegaDLBot.send_document(
+                        chat_id=ack_message.chat.id,
+                        document=temp_file,
+                        progress=UploadFiles().upload_progress_hook,
+                        progress_args=[ack_message.chat.id, ack_message.message_id]
+                    )
+
+                    await UploadFiles().send_file_to_dustbin(file_message, "doc", url)
 
             elif user_details['dld_settings'] == 'f-docs':
-                file_message = await MegaDLBot.send_document(
-                    chat_id=ack_message.chat.id,
-                    document=temp_file,
-                    progress=UploadFiles().upload_progress_hook,
-                    progress_args=[ack_message.chat.id, ack_message.message_id]
-                )
-                await UploadFiles().send_file_to_dustbin(file_message, "doc", url)
+                if str(file_type[0]).split("/")[0].lower() == "audio":
+                    file_message = await MegaDLBot.send_audio(
+                        chat_id=ack_message.chat.id,
+                        audio=temp_file,
+                        progress=UploadFiles().upload_progress_hook,
+                        progress_args=[ack_message.chat.id, ack_message.message_id]
+                    )
+
+                    await UploadFiles().send_file_to_dustbin(file_message, "audio", url)
+                else:
+                    file_message = await MegaDLBot.send_document(
+                        chat_id=ack_message.chat.id,
+                        document=temp_file,
+                        progress=UploadFiles().upload_progress_hook,
+                        progress_args=[ack_message.chat.id, ack_message.message_id]
+                    )
+                    await UploadFiles().send_file_to_dustbin(file_message, "doc", url)
             elif user_details['dld_settings'] == 'ct-docs':
                 temp_thumb = await UploadFiles().get_thumbnail(user_details['custom_thumbnail'])
-                file_message = await MegaDLBot.send_document(
-                    chat_id=ack_message.chat.id,
-                    document=temp_file,
-                    progress=UploadFiles().upload_progress_hook,
-                    progress_args=[ack_message.chat.id, ack_message.message_id],
-                    thumb=temp_thumb
-                )
-                await UploadFiles().send_file_to_dustbin(file_message, "doc", url)
+                if str(file_type[0]).split("/")[0].lower() == "audio":
+                    file_message = await MegaDLBot.send_audio(
+                        chat_id=ack_message.chat.id,
+                        audio=temp_file,
+                        progress=UploadFiles().upload_progress_hook,
+                        progress_args=[ack_message.chat.id, ack_message.message_id],
+                        thumb=temp_thumb
+                    )
+
+                    await UploadFiles().send_file_to_dustbin(file_message, "audio", url)
+                else:
+                    file_message = await MegaDLBot.send_document(
+                        chat_id=ack_message.chat.id,
+                        document=temp_file,
+                        progress=UploadFiles().upload_progress_hook,
+                        progress_args=[ack_message.chat.id, ack_message.message_id],
+                        thumb=temp_thumb
+                    )
+                    await UploadFiles().send_file_to_dustbin(file_message, "doc", url)
 
                 if os.path.exists(temp_thumb):
                     os.remove(temp_thumb)
             elif user_details['dld_settings'] == 'ct-videos':
-                file_type = mimetypes.guess_type(temp_file)
                 temp_thumb = await UploadFiles().get_thumbnail(user_details['custom_thumbnail'])
 
                 if str(file_type[0]).split("/")[0].lower() == "video":
@@ -73,6 +104,16 @@ class UploadFiles:
                         thumb=temp_thumb
                     )
                     await UploadFiles().send_file_to_dustbin(file_message, "video", url)
+                elif str(file_type[0]).split("/")[0].lower() == "audio":
+                    file_message = await MegaDLBot.send_audio(
+                        chat_id=ack_message.chat.id,
+                        audio=temp_file,
+                        progress=UploadFiles().upload_progress_hook,
+                        progress_args=[ack_message.chat.id, ack_message.message_id],
+                        thumb=temp_thumb
+                    )
+
+                    await UploadFiles().send_file_to_dustbin(file_message, "audio", url)
                 else:
                     file_message = await MegaDLBot.send_document(
                         chat_id=ack_message.chat.id,
@@ -112,6 +153,19 @@ class UploadFiles:
                 msg_id=fd_msg.message_id,
                 chat_id=fd_msg.chat.id,
                 file_type=fd_msg.video.mime_type,
+                url=url
+            )
+        elif media_type == "audio":
+            fd_msg = await file_message.forward(
+                chat_id=Common().bot_dustbin,
+                as_copy=True
+            )
+            await MegaFiles().insert_new_files(
+                filed_id=fd_msg.audio.file_id,
+                file_name=fd_msg.audio.file_name,
+                msg_id=fd_msg.message_id,
+                chat_id=fd_msg.chat.id,
+                file_type=fd_msg.audio.mime_type,
                 url=url
             )
         else:

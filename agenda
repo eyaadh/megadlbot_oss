@@ -62,9 +62,22 @@ Agenda:
 13. Screens:
 
 14: introduction of YTDL:
-with that being said, we are also concluding our video!!!... see ya next time with some improvements to
-YTDL hopefully... or may be otherwise... well have a nice day... may god bless u I mean :)
     - Moving uploading files to its own module [x]
     - Attending a GitHub raised issue [x]
     - Introduction to Youtube-dl (extracting audio) [x]
+
+15. Deployment to Heroku - the recommended way, getting media info of YT Links:
+    - audio files to be always uploaded as audio, despite which ever setting [x]
+    - Creating a module called nekofy [x]
+    - generating media info from YT Links [x]
+    - Demonstration of deployment to heroku the recommended way [x]
+
+16. Introduction to Asyncio Executor, Youtube-DL Video extraction and Bugfixes:
+ well even that is fixed... finally!!!! has been a lengthy video.. sometimes debugging can be pretty
+ frustrating, however once its all done that feeling of satisfication is unexplainable... and I spelled
+ that shit wrong, anyway I wish u well and have a nice day, we conclude the video for today here...
+    - Introduction to Asyncio Executor [x]
+    - Cleaning YTDL a bit as its [x]
+    - Introduction to Video Extraction on YTDL [x]
+    - Bug Fixes [x]
 

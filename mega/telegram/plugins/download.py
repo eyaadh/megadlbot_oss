@@ -36,7 +36,7 @@ async def new_message_dl_handler(c: Client, m: Message):
                 f"<a href='http://t.me/{me.username}?start=plf-{file['file_id']}'>{file['file_name']} - {file['file_type']}</a>"
                 for file in url_details
             ]
-            files_msg_formatted = '/n'.join(files)
+            files_msg_formatted = '\n'.join(files)
 
             await m.reply_text(
                 f"I also do have the following files that were uploaded earlier with the same url:\n"
@@ -87,12 +87,30 @@ async def url_process(m: Message):
             [
                 InlineKeyboardButton(text=f"{emoji.LOUDSPEAKER} Extract Audio",
                                      callback_data=f"ytaudio_{m.chat.id}_{m.message_id}"),
+                InlineKeyboardButton(text=f"{emoji.VIDEOCASSETTE} Extract Video",
+                                     callback_data=f"ytvid_{m.chat.id}_{m.message_id}")
+            ],
+            [
+                InlineKeyboardButton(text=f"{emoji.LIGHT_BULB} Media Info",
+                                     callback_data=f"ytmd_{m.chat.id}_{m.message_id}")
             ]
         ]
         await m.reply_text(
             text="What would you like to do with this file?",
             reply_markup=InlineKeyboardMarkup(inline_buttons)
         )
+
+
+@Client.on_callback_query(filters.callback_query("ytvid"), group=0)
+async def callback_ytvid_handler(c: Client, cb: CallbackQuery):
+    params = cb.payload.split('_')
+    cb_chat = int(params[0]) if len(params) > 0 else None
+    cb_message_id = int(params[1]) if len(params) > 1 else None
+
+    cb_message = await c.get_messages(cb_chat, cb_message_id) if cb_message_id is not None else None
+
+    await cb.answer()
+    await YTdl().extract(cb_message, "video")
 
 
 @Client.on_callback_query(filters.callback_query("ytaudio"), group=0)
@@ -104,7 +122,24 @@ async def callback_ytaudio_handler(c: Client, cb: CallbackQuery):
     cb_message = await c.get_messages(cb_chat, cb_message_id) if cb_message_id is not None else None
 
     await cb.answer()
-    await YTdl().extract_audio(cb_message)
+    await YTdl().extract(cb_message, "audio")
+
+
+@Client.on_callback_query(filters.callback_query("ytmd"), group=0)
+async def callback_ytmd_handler(c: Client, cb: CallbackQuery):
+    params = cb.payload.split('_')
+    cb_chat = int(params[0]) if len(params) > 0 else None
+    cb_message_id = int(params[1]) if len(params) > 1 else None
+
+    cb_message = await c.get_messages(cb_chat, cb_message_id) if cb_message_id is not None else None
+
+    await cb.answer()
+    video_info = await YTdl().yt_media_info(cb_message)
+
+    await cb_message.reply_text(
+        "Here is the Media Info you requested: \n"
+        f"{emoji.CAT} View on nekobin.com: {video_info}"
+    )
 
 
 @Client.on_callback_query(filters.callback_query("download"), group=0)

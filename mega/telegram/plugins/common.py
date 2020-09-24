@@ -23,6 +23,11 @@ async def start_message_handler(c: Client, m: Message):
                         video=file_message.video.file_id,
                         file_ref=file_message.video.file_ref
                     )
+                elif str(file_details['file_type'].split("/"))[0].lower() == "audio":
+                    await m.reply_audio(
+                        audio=file_message.audio.file_id,
+                        file_ref=file_message.audio.file_ref
+                    )
                 else:
                     await m.reply_document(
                         document=file_message.document.file_id,

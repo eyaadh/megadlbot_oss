@@ -13,7 +13,7 @@
 - Setup configs
     - Download the sample config file <br>
         - ```mkdir megadl && cd megadl```
-        - ```wget https://raw.githubusercontent.com/uaudith/megadlbot_oss/dev/mega/working_dir/sampleConfigForDocker.ini -O config.ini```
+        - ```wget https://raw.githubusercontent.com/uaudith/megadlbot_oss/dev/mega/working_dir/sampleConfigForDocker.ini.sample -O config.ini```
         - ```vim config.ini```
     - Download the yml file for docker-compose
         - ```wget https://raw.githubusercontent.com/uaudith/megadlbot_oss/dev/docker-compose.yml```

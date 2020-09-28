@@ -13,10 +13,10 @@
 - Setup configs
     - Download the sample config file <br>
         - ```mkdir megadl && cd megadl```
-        - ```wget https://raw.githubusercontent.com/uaudith/megadlbot_oss/dev/mega/working_dir/sampleConfigForDocker.ini.sample -O config.ini```
+        - ```wget https://raw.githubusercontent.com/eyaadh/megadlbot_oss/dev/mega/working_dir/sampleConfigForDocker.ini.sample -O config.ini```
         - ```vim config.ini```
     - Download the yml file for docker-compose
-        - ```wget https://raw.githubusercontent.com/uaudith/megadlbot_oss/dev/docker-compose.yml```
+        - ```wget https://raw.githubusercontent.com/eyaadh/megadlbot_oss/dev/docker-compose.yml```
 - Finally start the bot <br>
 ```docker-compose up -d```
 - Voila !! The bot should be running now <br>

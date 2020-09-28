@@ -3,7 +3,7 @@ version: "3.7"
 services:
   megadl:
       build:
-        context: https://github.com/uaudith/megadlbot_oss.git#dev
+        context: https://github.com/eyaadh/megadlbot_oss.git#dev
       depends_on:
         - mongo
       restart: on-failure

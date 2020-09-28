@@ -1,0 +1,27 @@
+version: "3.7"
+
+services:
+  megadl:
+      build:
+        context: https://github.com/uaudith/megadlbot_oss.git#dev
+      depends_on:
+        - mongo
+      restart: on-failure
+      environment:
+          DATABASE_DB_USERNAME: root
+          DATABASE_DB_HOST: mongo
+          DATABASE_DB_PASSWORD: example
+          DATABASE_DB_NAME: megadlbot
+      env_file:
+        - config.ini
+
+  mongo:
+      image: mongo
+      volumes:
+        - mongo_megadl:/data/db
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: example
+
+volumes:
+  mongo_megadl:

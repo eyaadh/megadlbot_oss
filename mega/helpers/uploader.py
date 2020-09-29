@@ -155,6 +155,19 @@ class UploadFiles:
                 file_type=fd_msg.video.mime_type,
                 url=url
             )
+        elif media_type == "audio":
+            fd_msg = await file_message.forward(
+                chat_id=Common().bot_dustbin,
+                as_copy=True
+            )
+            await MegaFiles().insert_new_files(
+                filed_id=fd_msg.audio.file_id,
+                file_name=fd_msg.audio.file_name,
+                msg_id=fd_msg.message_id,
+                chat_id=fd_msg.chat.id,
+                file_type=fd_msg.audio.mime_type,
+                url=url
+            )
         else:
             fd_msg = await file_message.forward(
                 chat_id=Common().bot_dustbin,

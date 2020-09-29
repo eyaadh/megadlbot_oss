@@ -36,7 +36,7 @@ exit
 vim /etc/mongodb.conf
 
 #Add these lines at the bottom of the YAML config file:
-auth=ture
+auth=true
 
 # now save the file and once its closed restart mongo service:
 service mongod restart

@@ -24,8 +24,8 @@ class Common:
             self.db_username = os.environ.get("DATABASE_DB_USERNAME")
             self.db_password = os.environ.get("DATABASE_DB_PASSWORD")
             self.db_name = os.environ.get("DATABASE_DB_NAME")
-            self.seedr_username = self.app_config.get("SEEDR_USERNAME", None)
-            self.seedr_password = self.app_config.get("SEEDR_PASSWORD", None)
+            self.seedr_username = os.environ.get("SEEDR_USERNAME", None)
+            self.seedr_password = os.environ.get("SEEDR_PASSWORD", None)
         else:
             self.app_config = configparser.ConfigParser()
 

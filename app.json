@@ -51,6 +51,12 @@
         },
         "DATABASE_DB_NAME": {
             "description": "Watch this video to understand what database is: https://youtu.be/vgzMacnI5Z8"
+        },
+        "SEEDR_USERNAME": {
+            "description": "Username for Seedr login"
+        },
+        "SEEDR_PASSWORD":{
+            "description": "Seedr Password"
         }
     },
     "buildpacks": [{

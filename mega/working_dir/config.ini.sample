@@ -16,3 +16,7 @@ db_host = localhost
 db_username = admin
 db_password = 
 db_name = megadlbot
+
+[seedr]
+username = something@someone.com
+pass = password

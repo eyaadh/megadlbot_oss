@@ -62,9 +62,25 @@ Agenda:
 13. Screens:
 
 14: introduction of YTDL:
-with that being said, we are also concluding our video!!!... see ya next time with some improvements to
-YTDL hopefully... or may be otherwise... well have a nice day... may god bless u I mean :)
     - Moving uploading files to its own module [x]
     - Attending a GitHub raised issue [x]
     - Introduction to Youtube-dl (extracting audio) [x]
 
+15. Deployment to Heroku - the recommended way, getting media info of YT Links:
+    - audio files to be always uploaded as audio, despite which ever setting [x]
+    - Creating a module called nekofy [x]
+    - generating media info from YT Links [x]
+    - Demonstration of deployment to heroku the recommended way [x]
+
+16. Introduction to Asyncio Executor, Youtube-DL Video extraction and Bugfixes:
+    - Introduction to Asyncio Executor [x]
+    - Cleaning YTDL a bit as its [x]
+    - Introduction to Video Extraction on YTDL [x]
+    - Bug Fixes [x]
+
+17. Introduction of Torrents:
+    - Introduction of Web API [x]
+
+   finally done with torrents, well added its support, now basically whats next should be uploading
+   these contents/downloaded stuff uncompressed... well until then, have a nice day!!! and stay healthy..
+   lets call it a video!!! I wish u all the best.

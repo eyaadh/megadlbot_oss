@@ -1,15 +1,21 @@
 import os
 import re
+import asyncio
+import logging
 import tldextract
+import humanfriendly as size
 from pyrogram import emoji, Client
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ForceReply
+from pyrogram.errors import MessageNotModified
 from .. import filters
+from mega.common import Common
 from mega.database.files import MegaFiles
 from mega.database.users import MegaUsers
 from mega.helpers.downloader import Downloader
 from mega.helpers.media_info import MediaInfo
 from mega.helpers.screens import Screens
 from mega.helpers.ytdl import YTdl
+from mega.helpers.seerd_api import SeedrAPI
 
 
 @Client.on_message(filters.private & filters.text, group=0)
@@ -26,9 +32,31 @@ async def new_message_dl_handler(c: Client, m: Message):
         r'(?::\d+)?'  # optional port
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
-    if re.match(regex, m.text):
+    if re.match(regex, m.text) or m.text.startswith("magnet"):
         url_count = await MegaFiles().count_files_by_url(m.text)
-        if url_count == 0:
+        if url_count == 0 and not m.text.startswith("magnet"):
+            if Common().seedr_username is not None:
+                await url_process(m)
+            else:
+                await m.reply_text("Well! I do not know how to download torrents unless you connect me to Seedr")
+        elif url_count == 0 and m.text.startswith("magnet"):
+            if Common().seedr_username is not None:
+                await call_seedr_download(m, "magnet")
+            else:
+                await m.reply_text("Well! I do not know how to download torrents unless you connect me to Seedr")
+        elif url_count != 0 and m.text.startswith("magnet"):
+            url_details = await MegaFiles().get_file_by_url(m.text)
+            files = [
+                f"<a href='http://t.me/{me.username}?start=plf-{file['file_id']}'>{file['file_name']} - {file['file_type']}</a>"
+                for file in url_details
+            ]
+            files_msg_formatted = '\n'.join(files)
+
+            await m.reply_text(
+                f"I also do have the following files that were uploaded earlier with the same url:\n"
+                f"{files_msg_formatted}",
+                disable_web_page_preview=True
+            )
             await url_process(m)
         else:
             url_details = await MegaFiles().get_file_by_url(m.text)
@@ -47,58 +75,101 @@ async def new_message_dl_handler(c: Client, m: Message):
 
 
 async def url_process(m: Message):
-    header_info = await Downloader.get_headers(m.text)
-    file_type_raw = header_info.get("Content-Type") if "Content-Type" in header_info else "None/None"
-    file_type_split = file_type_raw.split("/")[0]
-
-    if header_info is None:
+    if m.text.startswith("magnet"):
         await m.reply_text(
-            f"I do not know the details of the file to download the file! {emoji.MAN_RAISING_HAND_DARK_SKIN_TONE}"
-        )
-    elif header_info is not None and (tldextract.extract(m.text)).domain != "youtube":
-        file_size = header_info.get("Content-Length") if "Content-Length" in header_info else None
-        if file_size is not None and int(file_size) > 2147483648:
-            await m.reply_text(
-                f"Well that file is bigger than I can upload to telegram! {emoji.MAN_SHRUGGING_DARK_SKIN_TONE}"
+            text="What would you like to do with this file?",
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [InlineKeyboardButton(text=f"{emoji.MAGNET} Proceed with Download",
+                                          callback_data=f"magnet_{m.chat.id}_{m.message_id}")]
+                ]
             )
-        else:
+        )
+    else:
+        header_info = await Downloader.get_headers(m.text)
+        file_type_raw = header_info.get("Content-Type") if "Content-Type" in header_info else "None/None"
+        file_type_split = file_type_raw.split("/")[0]
+        file_content_disposition = header_info.get("content-disposition")
+        file_name_f_headers = re.findall("filename=(.+)", file_content_disposition)[0] if file_content_disposition else None
+        file_ext_f_name = os.path.splitext(str(file_name_f_headers).replace('"', ""))[1]
+
+        if header_info is None:
+            await m.reply_text(
+                f"I do not know the details of the file to download the file! {emoji.MAN_RAISING_HAND_DARK_SKIN_TONE}"
+            )
+        elif header_info is not None and (tldextract.extract(m.text)).domain != "youtube":
+            file_size = header_info.get("Content-Length") if "Content-Length" in header_info else None
+            if file_size is not None and int(file_size) > 2147483648:
+                await m.reply_text(
+                    f"Well that file is bigger than I can upload to telegram! {emoji.MAN_SHRUGGING_DARK_SKIN_TONE}"
+                )
+            else:
+                inline_buttons = [
+                    [
+                        InlineKeyboardButton(text=f"{emoji.FLOPPY_DISK} Download",
+                                             callback_data=f"download_{m.chat.id}_{m.message_id}"),
+                        InlineKeyboardButton(text=f"{emoji.PENCIL} Rename",
+                                             callback_data=f"rename_{m.chat.id}_{m.message_id}")
+                    ]
+                ]
+                if file_type_split.lower() == "video":
+                    inline_buttons.append([
+                        InlineKeyboardButton(text=f"{emoji.LIGHT_BULB} Media Info",
+                                             callback_data=f"info_{m.chat.id}_{m.message_id}"),
+                        InlineKeyboardButton(text=f"{emoji.FRAMED_PICTURE} Screens",
+                                             callback_data=f"screens_{m.chat.id}_{m.message_id}")
+                    ])
+                elif file_ext_f_name == ".torrent" and Common().seedr_username is not None:
+                    inline_buttons.append([
+                        InlineKeyboardButton(text=f"{emoji.TORNADO} Download Torrent",
+                                             callback_data=f"torrent_{m.chat.id}_{m.message_id}")
+                    ])
+                await m.reply_text(
+                    text="What would you like to do with this file?",
+                    reply_markup=InlineKeyboardMarkup(inline_buttons)
+                )
+
+        elif (tldextract.extract(m.text)).domain == "youtube":
             inline_buttons = [
                 [
-                    InlineKeyboardButton(text=f"{emoji.FLOPPY_DISK} Download",
-                                         callback_data=f"download_{m.chat.id}_{m.message_id}"),
-                    InlineKeyboardButton(text=f"{emoji.PENCIL} Rename",
-                                         callback_data=f"rename_{m.chat.id}_{m.message_id}")
+                    InlineKeyboardButton(text=f"{emoji.LOUDSPEAKER} Extract Audio",
+                                         callback_data=f"ytaudio_{m.chat.id}_{m.message_id}"),
+                    InlineKeyboardButton(text=f"{emoji.VIDEOCASSETTE} Extract Video",
+                                         callback_data=f"ytvid_{m.chat.id}_{m.message_id}")
+                ],
+                [
+                    InlineKeyboardButton(text=f"{emoji.LIGHT_BULB} Media Info",
+                                         callback_data=f"ytmd_{m.chat.id}_{m.message_id}")
                 ]
             ]
-            if file_type_split.lower() == "video":
-                inline_buttons.append([
-                    InlineKeyboardButton(text=f"{emoji.LIGHT_BULB} Media Info",
-                                         callback_data=f"info_{m.chat.id}_{m.message_id}"),
-                    InlineKeyboardButton(text=f"{emoji.FRAMED_PICTURE} Screens",
-                                         callback_data=f"screens_{m.chat.id}_{m.message_id}")
-                ])
             await m.reply_text(
                 text="What would you like to do with this file?",
                 reply_markup=InlineKeyboardMarkup(inline_buttons)
             )
 
-    elif (tldextract.extract(m.text)).domain == "youtube":
-        inline_buttons = [
-            [
-                InlineKeyboardButton(text=f"{emoji.LOUDSPEAKER} Extract Audio",
-                                     callback_data=f"ytaudio_{m.chat.id}_{m.message_id}"),
-                InlineKeyboardButton(text=f"{emoji.VIDEOCASSETTE} Extract Video",
-                                     callback_data=f"ytvid_{m.chat.id}_{m.message_id}")
-            ],
-            [
-                InlineKeyboardButton(text=f"{emoji.LIGHT_BULB} Media Info",
-                                     callback_data=f"ytmd_{m.chat.id}_{m.message_id}")
-            ]
-        ]
-        await m.reply_text(
-            text="What would you like to do with this file?",
-            reply_markup=InlineKeyboardMarkup(inline_buttons)
-        )
+
+@Client.on_callback_query(filters.callback_query("torrent"), group=0)
+async def callback_torrent_handler(c: Client, cb: CallbackQuery):
+    params = cb.payload.split('_')
+    cb_chat = int(params[0]) if len(params) > 0 else None
+    cb_message_id = int(params[1]) if len(params) > 1 else None
+
+    cb_message = await c.get_messages(cb_chat, cb_message_id) if cb_message_id is not None else None
+
+    await cb.answer()
+    await call_seedr_download(cb_message, "other")
+
+
+@Client.on_callback_query(filters.callback_query("magnet"), group=0)
+async def callback_magnet_handler(c: Client, cb: CallbackQuery):
+    params = cb.payload.split('_')
+    cb_chat = int(params[0]) if len(params) > 0 else None
+    cb_message_id = int(params[1]) if len(params) > 1 else None
+
+    cb_message = await c.get_messages(cb_chat, cb_message_id) if cb_message_id is not None else None
+
+    await cb.answer()
+    await call_seedr_download(cb_message, "magnet")
 
 
 @Client.on_callback_query(filters.callback_query("ytvid"), group=0)
@@ -220,3 +291,79 @@ async def reply_message_handler(c: Client, m: Message):
             )
 
             await Downloader().download_file(org_message.text, ack_message, new_file_name)
+
+
+@Client.on_callback_query(filters.callback_query("sdlc"), group=2)
+async def callback_sdlc_handler(c: Client, cb: CallbackQuery):
+    await cb.answer()
+
+    params = cb.payload.split('_')
+    folder_id = params[0] if len(params) > 0 else None
+    chat_id = int(params[1]) if len(params) > 1 else None
+    org_msg_id = int(params[2]) if len(params) > 2 else None
+    ack_msg_id = int(params[3]) if len(params) > 3 else None
+
+    org_msg = await c.get_messages(chat_id, org_msg_id)
+    ack_msg = await c.get_messages(chat_id, ack_msg_id)
+
+    folder_details = await SeedrAPI().get_folder(folder_id)
+    await SeedrAPI().download_folder(folder_details['id'], ack_msg, org_msg)
+
+
+async def call_seedr_download(msg: Message, torrent_type: str):
+    if torrent_type == "magnet":
+        ack_msg = await msg.reply_text(
+            "About to add the magnet link to seedr."
+        )
+
+        tr_process = await SeedrAPI().add_url(msg.text, "magnet")
+    else:
+        ack_msg = await msg.reply_text(
+            "About to add the link to seedr."
+        )
+        tr_process = await SeedrAPI().add_url(msg.text, "other")
+
+    if tr_process["result"] is True:
+        try:
+            while True:
+                await asyncio.sleep(4)
+                tr_progress = await SeedrAPI().get_torrent_details(tr_process["user_torrent_id"])
+                if tr_progress["progress"] < 100:
+                    try:
+                        await ack_msg.edit_text(
+                            f"Uploading to Seedr: \n"
+                            f"Progress: {tr_progress['progress']}% | "
+                            f"Size: {size.format_size(tr_progress['size'], binary=True)}"
+                        )
+                    except MessageNotModified as e:
+                        logging.error(e)
+                else:
+                    await asyncio.sleep(10)
+                    tr_progress = await SeedrAPI().get_torrent_details(tr_process["user_torrent_id"])
+                    await ack_msg.edit_text("How would you like to upload the contents?")
+                    await ack_msg.edit_reply_markup(
+                        InlineKeyboardMarkup(
+                            [
+                                [
+                                    InlineKeyboardButton(text=f"{emoji.CARD_FILE_BOX} Compressed",
+                                                         callback_data=f"sdlc_{str(tr_progress['folder_created'])}"
+                                                                       f"_{msg.chat.id}_{msg.message_id}"
+                                                                       f"_{ack_msg.message_id}")
+                                ]
+                            ]
+                        )
+                    )
+                    break
+        except Exception as e:
+            logging.error(e)
+    else:
+        try:
+            error = tr_process['error']
+        except KeyError:
+            error = None
+
+        logging.error(error)
+        await ack_msg.edit_text(
+            f"An error occurred:\n<pre>{error}</pre>",
+            parse_mode="html"
+        )

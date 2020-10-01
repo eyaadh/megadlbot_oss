@@ -68,7 +68,6 @@ class SeedrAPI:
                     ) as resp:
                 return json.loads(await resp.text())
     async def download_folder(self, folder_id: str, ack_message: Message, org_message: Message):
-    async def download_folder(self, folder_id: str, ack_message: Message, org_message: Message):
         endpoint = f"{self.web_dav}/folder/{folder_id}/download"
         temp_dir = os.path.join(Common().working_dir, secrets.token_hex(2))
         if not os.path.exists(temp_dir):

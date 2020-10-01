@@ -142,11 +142,11 @@ class UploadFiles:
 
     @staticmethod
     async def send_file_to_dustbin(file_message: Message, media_type: str, url: str):
+        fd_msg = await file_message.forward(
+            chat_id=Common().bot_dustbin,
+            as_copy=True
+        )
         if media_type == "video":
-            fd_msg = await file_message.forward(
-                chat_id=Common().bot_dustbin,
-                as_copy=True
-            )
             await MegaFiles().insert_new_files(
                 filed_id=fd_msg.video.file_id,
                 file_name=fd_msg.video.file_name,
@@ -156,10 +156,6 @@ class UploadFiles:
                 url=url
             )
         elif media_type == "audio":
-            fd_msg = await file_message.forward(
-                chat_id=Common().bot_dustbin,
-                as_copy=True
-            )
             await MegaFiles().insert_new_files(
                 filed_id=fd_msg.audio.file_id,
                 file_name=fd_msg.audio.file_name,
@@ -169,10 +165,6 @@ class UploadFiles:
                 url=url
             )
         else:
-            fd_msg = await file_message.forward(
-                chat_id=Common().bot_dustbin,
-                as_copy=True
-            )
             await MegaFiles().insert_new_files(
                 filed_id=fd_msg.document.file_id,
                 file_name=fd_msg.document.file_name,

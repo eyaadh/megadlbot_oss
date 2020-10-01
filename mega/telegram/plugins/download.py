@@ -44,7 +44,7 @@ async def new_message_dl_handler(c: Client, m: Message):
                 await call_seedr_download(m, "magnet")
             else:
                 await m.reply_text("Well! I do not know how to download torrents unless you connect me to Seedr")
-        elif url_count != 0 and m.text.startswith("magnet"):
+        elif m.text.startswith("magnet"):
             url_details = await MegaFiles().get_file_by_url(m.text)
             files = [
                 f"<a href='http://t.me/{me.username}?start=plf-{file['file_id']}'>{file['file_name']} - {file['file_type']}</a>"
@@ -71,7 +71,8 @@ async def new_message_dl_handler(c: Client, m: Message):
                 f"{files_msg_formatted}",
                 disable_web_page_preview=True
             )
-            await url_process(m)
+
+        await url_process(m)
 
 
 async def url_process(m: Message):
@@ -97,7 +98,7 @@ async def url_process(m: Message):
             await m.reply_text(
                 f"I do not know the details of the file to download the file! {emoji.MAN_RAISING_HAND_DARK_SKIN_TONE}"
             )
-        elif header_info is not None and (tldextract.extract(m.text)).domain != "youtube":
+        elif (tldextract.extract(m.text)).domain != "youtube":
             file_size = header_info.get("Content-Length") if "Content-Length" in header_info else None
             if file_size is not None and int(file_size) > 2147483648:
                 await m.reply_text(

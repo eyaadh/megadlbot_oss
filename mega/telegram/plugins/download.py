@@ -34,9 +34,6 @@ async def new_message_dl_handler(c: Client, m: Message):
 
     if re.match(regex, m.text) or m.text.startswith("magnet"):
         url_count = await MegaFiles().count_files_by_url(m.text)
-<<<<<<< dev
-        if url_count != 0:
-=======
         if url_count == 0 and not m.text.startswith("magnet"):
             if Common().seedr_username is not None:
                 await url_process(m)
@@ -47,7 +44,7 @@ async def new_message_dl_handler(c: Client, m: Message):
                 await call_seedr_download(m, "magnet")
             else:
                 await m.reply_text("Well! I do not know how to download torrents unless you connect me to Seedr")
-        elif url_count != 0 and m.text.startswith("magnet"):
+        elif m.text.startswith("magnet"):
             url_details = await MegaFiles().get_file_by_url(m.text)
             files = [
                 f"<a href='http://t.me/{me.username}?start=plf-{file['file_id']}'>{file['file_name']} - {file['file_type']}</a>"
@@ -62,7 +59,6 @@ async def new_message_dl_handler(c: Client, m: Message):
             )
             await url_process(m)
         else:
->>>>>>> dev
             url_details = await MegaFiles().get_file_by_url(m.text)
             files = [
                 f"<a href='http://t.me/{me.username}?start=plf-{file['file_id']}'>{file['file_name']} - {file['file_type']}</a>"
@@ -90,11 +86,6 @@ async def url_process(m: Message):
                 ]
             )
         )
-<<<<<<< dev
-    elif (tldextract.extract(m.text)).domain != "youtube":
-        file_size = header_info.get("Content-Length") if "Content-Length" in header_info else None
-        if file_size is not None and int(file_size) > 2147483648:
-=======
     else:
         header_info = await Downloader.get_headers(m.text)
         file_type_raw = header_info.get("Content-Type") if "Content-Type" in header_info else "None/None"
@@ -104,11 +95,10 @@ async def url_process(m: Message):
         file_ext_f_name = os.path.splitext(str(file_name_f_headers).replace('"', ""))[1]
 
         if header_info is None:
->>>>>>> dev
             await m.reply_text(
                 f"I do not know the details of the file to download the file! {emoji.MAN_RAISING_HAND_DARK_SKIN_TONE}"
             )
-        elif header_info is not None and (tldextract.extract(m.text)).domain != "youtube":
+        elif (tldextract.extract(m.text)).domain != "youtube":
             file_size = header_info.get("Content-Length") if "Content-Length" in header_info else None
             if file_size is not None and int(file_size) > 2147483648:
                 await m.reply_text(

@@ -1,18 +1,20 @@
-import os
-import time
 import asyncio
-import aiohttp
 import logging
-import secrets
-import aiofiles
-import typing
 import mimetypes
+import os
+import secrets
+import time
+import typing
 import urllib.parse
+
+import aiofiles
+import aiohttp
 import humanfriendly as size
-from pyrogram.types import Message
-from mega.telegram import MegaDLBot
-from mega.helpers.uploader import UploadFiles
 from pyrogram.errors import MessageNotModified, FloodWait
+from pyrogram.types import Message
+
+from mega.helpers.uploader import UploadFiles
+from mega.telegram import MegaDLBot
 
 status_progress = {}
 
@@ -50,7 +52,7 @@ class Downloader:
                         await dl_file.write(chunk)
                         dl_len += len(chunk)
                         if (time.time() - status_progress[
-                                f"{ack_message.chat.id}{ack_message.message_id}"]["last_download_updated"]) > 5:
+                            f"{ack_message.chat.id}{ack_message.message_id}"]["last_download_updated"]) > 5:
                             try:
                                 await MegaDLBot.edit_message_text(
                                     chat_id=ack_message.chat.id,

@@ -68,4 +68,4 @@ class Downloader:
 
                             status_progress[f"{ack_message.chat.id}{ack_message.message_id}"][
                                 "last_download_updated"] = time.time()
-        await UploadFiles().upload_file(temp_file, ack_message, url)
+        await UploadFiles().upload_file(temp_file, ack_message, url, "other")

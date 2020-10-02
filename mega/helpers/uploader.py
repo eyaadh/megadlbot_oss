@@ -22,7 +22,7 @@ status_progress = {}
 
 class UploadFiles:
     @staticmethod
-    async def upload_file(temp_file: str, ack_message: Message, url: str):
+    async def upload_file(temp_file: str, ack_message: Message, url: str, upload_type: str):
         file_type = mimetypes.guess_type(temp_file)
         await MegaDLBot.edit_message_text(
             chat_id=ack_message.chat.id,
@@ -130,17 +130,18 @@ class UploadFiles:
                     os.remove(temp_thumb)
 
         finally:
-            await MegaDLBot.delete_messages(
-                chat_id=ack_message.chat.id,
-                message_ids=ack_message.message_id
-            )
+            if upload_type != "compressed":
+                await MegaDLBot.delete_messages(
+                    chat_id=ack_message.chat.id,
+                    message_ids=ack_message.message_id
+                )
 
-            if os.path.exists(temp_file):
-                # we are just going to remove this file & its folder from our local, since its useless at local now
-                try:
-                    shutil.rmtree(os.path.dirname(temp_file))
-                except Exception as e:
-                    logging.error(str(e))
+                if os.path.exists(temp_file):
+                    # we are just going to remove this file & its folder from our local, since its useless at local now
+                    try:
+                        shutil.rmtree(os.path.dirname(temp_file))
+                    except Exception as e:
+                        logging.error(str(e))
 
     @staticmethod
     async def send_file_to_dustbin(file_message: Message, media_type: str, url: str):

@@ -308,7 +308,24 @@ async def callback_sdlc_handler(c: Client, cb: CallbackQuery):
     ack_msg = await c.get_messages(chat_id, ack_msg_id)
 
     folder_details = await SeedrAPI().get_folder(folder_id)
-    await SeedrAPI().download_folder(folder_details['id'], ack_msg, org_msg)
+    await SeedrAPI().download_folder(folder_details['id'], ack_msg, org_msg, "other")
+
+
+@Client.on_callback_query(filters.callback_query("unsd"), group=2)
+async def callback_unsd_handler(c: Client, cb: CallbackQuery):
+    await cb.answer()
+
+    params = cb.payload.split('_')
+    folder_id = params[0] if len(params) > 0 else None
+    chat_id = int(params[1]) if len(params) > 1 else None
+    org_msg_id = int(params[2]) if len(params) > 2 else None
+    ack_msg_id = int(params[3]) if len(params) > 3 else None
+
+    org_msg = await c.get_messages(chat_id, org_msg_id)
+    ack_msg = await c.get_messages(chat_id, ack_msg_id)
+
+    folder_details = await SeedrAPI().get_folder(folder_id)
+    await SeedrAPI().download_folder(folder_details['id'], ack_msg, org_msg, "compressed")
 
 
 async def call_seedr_download(msg: Message, torrent_type: str):
@@ -346,8 +363,14 @@ async def call_seedr_download(msg: Message, torrent_type: str):
                         InlineKeyboardMarkup(
                             [
                                 [
-                                    InlineKeyboardButton(text=f"{emoji.CARD_FILE_BOX} Compressed",
+                                    InlineKeyboardButton(text=f"{emoji.PACKAGE} Compressed",
                                                          callback_data=f"sdlc_{str(tr_progress['folder_created'])}"
+                                                                       f"_{msg.chat.id}_{msg.message_id}"
+                                                                       f"_{ack_msg.message_id}")
+                                ],
+                                [
+                                    InlineKeyboardButton(text=f"{emoji.CARD_FILE_BOX} UnCompressed",
+                                                         callback_data=f"unsd_{str(tr_progress['folder_created'])}"
                                                                        f"_{msg.chat.id}_{msg.message_id}"
                                                                        f"_{ack_msg.message_id}")
                                 ]

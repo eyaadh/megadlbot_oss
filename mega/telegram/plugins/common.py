@@ -2,11 +2,13 @@ from pyrogram import filters, emoji, Client
 from pyrogram.types import Message
 
 from mega.database.files import MegaFiles
+from mega.database.users import MegaUsers
 from ...telegram import Common
 
 
 @Client.on_message(filters.command("start", prefixes=["/"]))
 async def start_message_handler(c: Client, m: Message):
+    await MegaUsers().insert_user(m.from_user.id)
     if len(m.command) > 1:
         if m.command[1].split("-")[0] == 'plf':
             file_id = m.command[1].split("-", 1)[1]

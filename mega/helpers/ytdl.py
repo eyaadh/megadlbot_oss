@@ -67,7 +67,7 @@ class YTdl:
                     file_name = os.path.basename(temp_file)
                     pre, _ = os.path.splitext(file_name)
                     temp_file = os.path.join(temp_dir, f"{pre}.mp3")
-                await UploadFiles().upload_file(temp_file, ack_message, msg.text)
+                await UploadFiles().upload_file(temp_file, ack_message, msg.text, "other")
                 break
             else:
                 await asyncio.sleep(1)

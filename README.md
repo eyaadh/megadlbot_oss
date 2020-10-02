@@ -106,6 +106,11 @@ db_host = localhost
 db_username = admin
 db_password = 
 db_name = megadlbot
+
+# uncomment and fill in the credentials for seedr if you will be using it.
+#[seedr]
+#username = something@someone.com
+#pass = password
 ```
 
 ---

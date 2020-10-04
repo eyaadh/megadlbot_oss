@@ -12,7 +12,7 @@ multidict==4.7.6
 pyaes==1.6.1
 pymongo==3.11.0
 pyreadline==2.1
-Pyrogram==1.0.6
+Pyrogram==1.0.7
 PySocks==1.7.1
 requests==2.24.0
 requests-file==1.5.1

@@ -44,7 +44,7 @@ async def new_message_dl_handler(c: Client, m: Message):
                 await call_seedr_download(m, "magnet")
             else:
                 await m.reply_text("Well! I do not know how to download torrents unless you connect me to Seedr")
-        elif url_count != 0 and m.text.startswith("magnet"):
+        elif m.text.startswith("magnet"):
             url_details = await MegaFiles().get_file_by_url(m.text)
             files = [
                 f"<a href='http://t.me/{me.username}?start=plf-{file['file_id']}'>{file['file_name']} - {file['file_type']}</a>"
@@ -71,7 +71,8 @@ async def new_message_dl_handler(c: Client, m: Message):
                 f"{files_msg_formatted}",
                 disable_web_page_preview=True
             )
-            await url_process(m)
+
+        await url_process(m)
 
 
 async def url_process(m: Message):
@@ -97,7 +98,7 @@ async def url_process(m: Message):
             await m.reply_text(
                 f"I do not know the details of the file to download the file! {emoji.MAN_RAISING_HAND_DARK_SKIN_TONE}"
             )
-        elif header_info is not None and (tldextract.extract(m.text)).domain != "youtube":
+        elif (tldextract.extract(m.text)).domain != "youtube":
             file_size = header_info.get("Content-Length") if "Content-Length" in header_info else None
             if file_size is not None and int(file_size) > 2147483648:
                 await m.reply_text(
@@ -307,7 +308,24 @@ async def callback_sdlc_handler(c: Client, cb: CallbackQuery):
     ack_msg = await c.get_messages(chat_id, ack_msg_id)
 
     folder_details = await SeedrAPI().get_folder(folder_id)
-    await SeedrAPI().download_folder(folder_details['id'], ack_msg, org_msg)
+    await SeedrAPI().download_folder(folder_details['id'], ack_msg, org_msg, "other")
+
+
+@Client.on_callback_query(filters.callback_query("unsd"), group=2)
+async def callback_unsd_handler(c: Client, cb: CallbackQuery):
+    await cb.answer()
+
+    params = cb.payload.split('_')
+    folder_id = params[0] if len(params) > 0 else None
+    chat_id = int(params[1]) if len(params) > 1 else None
+    org_msg_id = int(params[2]) if len(params) > 2 else None
+    ack_msg_id = int(params[3]) if len(params) > 3 else None
+
+    org_msg = await c.get_messages(chat_id, org_msg_id)
+    ack_msg = await c.get_messages(chat_id, ack_msg_id)
+
+    folder_details = await SeedrAPI().get_folder(folder_id)
+    await SeedrAPI().download_folder(folder_details['id'], ack_msg, org_msg, "compressed")
 
 
 async def call_seedr_download(msg: Message, torrent_type: str):
@@ -345,8 +363,14 @@ async def call_seedr_download(msg: Message, torrent_type: str):
                         InlineKeyboardMarkup(
                             [
                                 [
-                                    InlineKeyboardButton(text=f"{emoji.CARD_FILE_BOX} Compressed",
+                                    InlineKeyboardButton(text=f"{emoji.PACKAGE} Compressed",
                                                          callback_data=f"sdlc_{str(tr_progress['folder_created'])}"
+                                                                       f"_{msg.chat.id}_{msg.message_id}"
+                                                                       f"_{ack_msg.message_id}")
+                                ],
+                                [
+                                    InlineKeyboardButton(text=f"{emoji.CARD_FILE_BOX} UnCompressed",
+                                                         callback_data=f"unsd_{str(tr_progress['folder_created'])}"
                                                                        f"_{msg.chat.id}_{msg.message_id}"
                                                                        f"_{ack_msg.message_id}")
                                 ]

@@ -31,7 +31,7 @@ async def inline_query_handler(c: Client, iq: InlineQuery):
                 )
             )
 
-    if len(res) > 0:
+    if res:
         await iq.answer(
             results=res,
             cache_time=0,

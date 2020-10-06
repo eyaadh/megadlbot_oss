@@ -14,7 +14,7 @@ class Gdrive:
     def __init__(self):
         self.scope = ["https://www.googleapis.com/auth/drive"]
 
-    async def upload_file(self, user_id: int, file: str):
+    async def upload_file(self, user_id: int, mfile: str):
         user_details = await MegaUsers().get_user(user_id)
 
         if "gdrive_key" in user_details:
@@ -27,15 +27,15 @@ class Gdrive:
                 filename=key_file_location, scopes=self.scope,
             )
 
-            service = build('drive', 'v3', credentials=credentials)
+            service = build('drive', 'v3', credentials=credentials, cache_discovery=False)
 
-            file_name = os.path.basename(file)
+            file_name = os.path.basename(mfile)
             file_metadata = {
                 'name': file_name,
                 'mimeType': (mimetypes.guess_type(file_name))[0]
             }
 
-            media = MediaFileUpload(key_file_location,
+            media = MediaFileUpload(mfile,
                                     mimetype=(mimetypes.guess_type(file_name))[0],
                                     resumable=True)
 

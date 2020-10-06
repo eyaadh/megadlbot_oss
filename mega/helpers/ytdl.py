@@ -34,6 +34,7 @@ class YTdl:
                 'outtmpl': f'{temp_dir}/%(title)s.%(ext)s',
                 'progress_hooks': [YTdl().progress_hooks],
                 'ignoreerrors': 'true',
+                'source_address': '0.0.0.0',
                 'postprocessors': [{
                     'key': 'FFmpegExtractAudio',
                     'preferredcodec': 'mp3',
@@ -47,6 +48,7 @@ class YTdl:
                 'outtmpl': f'{temp_dir}/%(title)s.%(ext)s',
                 'progress_hooks': [YTdl().progress_hooks],
                 'ignoreerrors': 'true',
+                'source_address': '0.0.0.0'
             }
 
         yt_progress_updates[f"{msg.chat.id}{msg.message_id}"] = {

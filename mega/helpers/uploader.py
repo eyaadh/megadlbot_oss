@@ -215,7 +215,7 @@ class UploadFiles:
         if gfile:
             glink = f"https://drive.google.com/file/d/{gfile.get('id')}"
             await file_msg.edit_text(
-                f"Here is the gdrive <a href={glink}> link</a>",
+                f"Here is the gdrive <a href={glink}> link</a>, this link might expire in 12hrs",
                 parse_mode="html",
                 disable_web_page_preview=True
             )

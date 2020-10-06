@@ -1,11 +1,13 @@
 import os
 import base64
+import logging
 import aiofiles
 import mimetypes
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 from googleapiclient.http import MediaFileUpload
 from mega.database.users import MegaUsers
+from datetime import datetime, timedelta, timezone
 
 
 class Gdrive:
@@ -42,5 +44,23 @@ class Gdrive:
                                            fields='id').execute()
 
             service.permissions().create(body={"role": "reader", "type": "anyone"}, fileId=gfile.get("id")).execute()
+            await Gdrive().clean_old_files(service)
 
             return gfile
+
+    @staticmethod
+    async def clean_old_files(service: build):
+        twelve_hours_since_now = datetime.now(tz=timezone.utc) - timedelta(hours=12)
+        twelve_hours_since_now.strftime("%Y-%m-%dT%H:%M:%SZ")
+        date_str = twelve_hours_since_now.isoformat(timespec='milliseconds')
+        date_str = str(date_str).replace('+00:00', '')
+
+        response = service.files().list(q=f"modifiedTime < '{date_str}'",
+                                        spaces="drive",
+                                        fields="nextPageToken, files(id, name)").execute()
+
+        old_files = response.get("files")
+
+        for file in old_files:
+            logging.info(f"I am removing {file} from google drive since its already old enough.")
+            service.files().delete(fileId=file.get("id")).execute()

@@ -11,7 +11,8 @@ Megatron is a project that is very close to my heart - me being the whole brain 
 3. [pymongo](https://github.com/mongodb/mongo-python-driver)
 4. [pyrogram](https://docs.pyrogram.org/)
 5. [tgcrypto](https://docs.pyrogram.org/topics/tgcrypto)
-6. [google-api-python-client](https://github.com/googleapis/google-api-python-client)
+6. [Youtube-dl](https://github.com/ytdl-org/youtube-dl)
+7. [google-api-python-client](https://github.com/googleapis/google-api-python-client)
 
 The application makes use of [MongoDB](https://www.mongodb.com/) for its database, also uses [ffprobe](https://ffmpeg.org/ffprobe.html) from ffmpeg for generating media info.
 Also optionally it makes use of [seedr](https://www.seedr.cc/) API to allow download torrents via the bot.

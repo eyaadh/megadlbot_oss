@@ -16,6 +16,7 @@ from mega.common import Common
 from mega.database.files import MegaFiles
 from mega.database.users import MegaUsers
 from mega.telegram import MegaDLBot
+from mega.helpers.gdrive import Gdrive
 
 status_progress = {}
 
@@ -42,6 +43,7 @@ class UploadFiles:
                     )
 
                     await UploadFiles().send_file_to_dustbin(file_message, "audio", url)
+                    await UploadFiles().handle_gdrive(file_message, ack_message, temp_file)
                 else:
                     file_message = await MegaDLBot.send_document(
                         chat_id=ack_message.chat.id,
@@ -51,7 +53,7 @@ class UploadFiles:
                     )
 
                     await UploadFiles().send_file_to_dustbin(file_message, "doc", url)
-
+                    await UploadFiles().handle_gdrive(file_message, ack_message, temp_file)
             elif user_details['dld_settings'] == 'f-docs':
                 if str(file_type[0]).split("/")[0].lower() == "audio":
                     file_message = await MegaDLBot.send_audio(
@@ -62,6 +64,7 @@ class UploadFiles:
                     )
 
                     await UploadFiles().send_file_to_dustbin(file_message, "audio", url)
+                    await UploadFiles().handle_gdrive(file_message, ack_message, temp_file)
                 else:
                     file_message = await MegaDLBot.send_document(
                         chat_id=ack_message.chat.id,
@@ -70,6 +73,7 @@ class UploadFiles:
                         progress_args=[ack_message.chat.id, ack_message.message_id]
                     )
                     await UploadFiles().send_file_to_dustbin(file_message, "doc", url)
+                    await UploadFiles().handle_gdrive(file_message, ack_message, temp_file)
             elif user_details['dld_settings'] == 'ct-docs':
                 temp_thumb = await UploadFiles().get_thumbnail(user_details['custom_thumbnail'])
                 if str(file_type[0]).split("/")[0].lower() == "audio":
@@ -82,6 +86,7 @@ class UploadFiles:
                     )
 
                     await UploadFiles().send_file_to_dustbin(file_message, "audio", url)
+                    await UploadFiles().handle_gdrive(file_message, ack_message, temp_file)
                 else:
                     file_message = await MegaDLBot.send_document(
                         chat_id=ack_message.chat.id,
@@ -91,7 +96,7 @@ class UploadFiles:
                         thumb=temp_thumb
                     )
                     await UploadFiles().send_file_to_dustbin(file_message, "doc", url)
-
+                    await UploadFiles().handle_gdrive(file_message, ack_message, temp_file)
                 if os.path.exists(temp_thumb):
                     os.remove(temp_thumb)
             elif user_details['dld_settings'] == 'ct-videos':
@@ -106,6 +111,7 @@ class UploadFiles:
                         thumb=temp_thumb
                     )
                     await UploadFiles().send_file_to_dustbin(file_message, "video", url)
+                    await UploadFiles().handle_gdrive(file_message, ack_message, temp_file)
                 elif str(file_type[0]).split("/")[0].lower() == "audio":
                     file_message = await MegaDLBot.send_audio(
                         chat_id=ack_message.chat.id,
@@ -116,6 +122,7 @@ class UploadFiles:
                     )
 
                     await UploadFiles().send_file_to_dustbin(file_message, "audio", url)
+                    await UploadFiles().handle_gdrive(file_message, ack_message, temp_file)
                 else:
                     file_message = await MegaDLBot.send_document(
                         chat_id=ack_message.chat.id,
@@ -125,7 +132,7 @@ class UploadFiles:
                         thumb=temp_thumb
                     )
                     await UploadFiles().send_file_to_dustbin(file_message, "doc", url)
-
+                    await UploadFiles().handle_gdrive(file_message, ack_message, temp_file)
                 if os.path.exists(temp_thumb):
                     os.remove(temp_thumb)
 
@@ -201,3 +208,13 @@ class UploadFiles:
         async with aiofiles.open(temp_file, mode='wb') as temp_thumb:
             await temp_thumb.write(base64.decodebytes(data))
         return temp_file
+
+    @staticmethod
+    async def handle_gdrive(file_msg: Message, ack_msg: Message, temp_file: str):
+        gfile = await Gdrive().upload_file(ack_msg.chat.id, temp_file)
+        glink = f"https://drive.google.com/file/d/{gfile.get('id')}"
+        await file_msg.edit_text(
+            f"Here is the gdrive <a href={glink}> link</a>",
+            parse_mode="html",
+            disable_web_page_preview=True
+        )

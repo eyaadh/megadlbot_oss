@@ -11,8 +11,13 @@ Megatron is a project that is very close to my heart - me being the whole brain 
 3. [pymongo](https://github.com/mongodb/mongo-python-driver)
 4. [pyrogram](https://docs.pyrogram.org/)
 5. [tgcrypto](https://docs.pyrogram.org/topics/tgcrypto)
+6. [google-api-python-client](https://github.com/googleapis/google-api-python-client)
 
 The application makes use of [MongoDB](https://www.mongodb.com/) for its database, also uses [ffprobe](https://ffmpeg.org/ffprobe.html) from ffmpeg for generating media info.
+
+
+To make use of google API to generate google drive links for the files that you upload, you would also require to create a service account and share its key with the bot from the available options at /dldsettings, to generate this key make use of this step by step [documentation](https://support.google.com/a/answer/7378726?hl=en) or otherwise a much in depth detailed documentation [here](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+
 ## Run on Docker 🐳
 ```You can simply ignore everything below if you choose to go with Docker Method```<br>
 - [Docker Guide](DockerReadme.md)

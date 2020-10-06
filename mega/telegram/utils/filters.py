@@ -10,7 +10,7 @@ def callback_query(args: str, payload=True):
     """
     async def func(ftl, __, query: CallbackQuery):
         if payload:
-            thing = "{}\_"
+            thing = r"{}\_"
             if re.search(re.compile(thing.format(ftl.data)), query.data):
                 search = re.search(re.compile(r"\_{1}(.*)"), query.data)
                 if search:

@@ -7,6 +7,7 @@ from pyrogram import emoji, Client
 from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, ForceReply
 
 from mega.database.users import MegaUsers
+from mega.helpers.gdrive import Gdrive
 from .. import filters
 
 
@@ -23,7 +24,9 @@ async def dld_settings_handler(c: Client, m: Message):
                 [InlineKeyboardButton(text=f"{emoji.WRENCH} Change Download Settings",
                                       callback_data=f"dlsettings_{m.chat.id}")],
                 [InlineKeyboardButton(text=f"{emoji.VIDEO_CAMERA} Set a Custom Thumbnail",
-                                      callback_data=f"thumbnail_{m.chat.id}")]
+                                      callback_data=f"thumbnail_{m.chat.id}")],
+                [InlineKeyboardButton(text=f"{emoji.OPEN_MAILBOX_WITH_RAISED_FLAG} Attach Google Drive",
+                                      callback_data=f"googleset_{m.chat.id}")]
             ]
         )
     )
@@ -116,3 +119,46 @@ async def ct_videos_cb_handler(c: Client, cb: CallbackQuery):
     else:
         await MegaUsers().update_dld_settings(cb.message.chat.id, "ct-videos")
         await cb.answer("Your settings has been updated to Video w Thumbnail")
+
+
+@Client.on_callback_query(filters.callback_query("googleset"), group=5)
+async def googleset_cb_handler(c: Client, cb: CallbackQuery):
+    user_details = await MegaUsers().get_user(cb.message.chat.id)
+
+    if "gdrive_key" in user_details:
+        await c.send_message(
+            chat_id=cb.message.chat.id,
+            text=f"GDV_{cb.message.message_id}\n"
+                 "You had already set a gdrive key, to replace it as a reply to this message send me the new "
+                 "service account key"
+        )
+    else:
+        await c.send_message(
+            chat_id=cb.message.chat.id,
+            text=f"GDV_{cb.message.message_id}\n"
+                 "You have not given me a gdrive key as of yet. As a reply to this message, "
+                 "send me the service account key.",
+            reply_markup=ForceReply(True)
+        )
+
+
+@Client.on_message(filters.reply & filters.private & filters.document, group=3)
+async def googleset_reply_msg_handler(c: Client, m: Message):
+    func_message_obj = str(m.reply_to_message.text).splitlines()[0].split("_")
+    key_file = f"working_dir/{secrets.token_hex(2)}.json"
+
+    if len(func_message_obj) > 1:
+        func = func_message_obj[0]
+
+        if func == "GDV":
+            await c.download_media(message=m.document, file_name=key_file)
+
+            async with aiofiles.open(f"mega/{key_file}", mode='rb') as thumb:
+                base64_key = base64.b64encode(await thumb.read())
+
+            await MegaUsers().update_gdrive(m.from_user.id, base64_key, key_file)
+
+            await m.reply_text(
+                f"The key has been successfully attached. I will also provide you with a Gdrive link for the "
+                f"files you upload here on {emoji.HANDSHAKE}"
+            )

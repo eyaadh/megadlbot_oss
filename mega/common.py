@@ -19,10 +19,13 @@ class Common:
                 os.environ.get("ALLOWED_USERS", '[]')
             )
 
+            self.is_atlas = os.environ.get('IS_ATLAS', None)
             self.db_host = os.environ.get("DATABASE_DB_HOST")
             self.db_username = os.environ.get("DATABASE_DB_USERNAME")
             self.db_password = os.environ.get("DATABASE_DB_PASSWORD")
             self.db_name = os.environ.get("DATABASE_DB_NAME")
+            self.seedr_username = os.environ.get("SEEDR_USERNAME", None)
+            self.seedr_password = os.environ.get("SEEDR_PASSWORD", None)
         else:
             self.app_config = configparser.ConfigParser()
 
@@ -39,7 +42,11 @@ class Common:
                 self.app_config.get("bot-configuration", "allowed_users", fallback='[]')
             )
 
+            self.is_atlas = self.app_config.getboolean('database', 'is_atlas', fallback=False)
             self.db_host = self.app_config.get("database", "db_host")
             self.db_username = self.app_config.get("database", "db_username", fallback=None)
             self.db_password = self.app_config.get("database", "db_password", fallback=None)
             self.db_name = self.app_config.get("database", "db_name")
+
+            self.seedr_username = self.app_config.get("seedr", "username", fallback=None)
+            self.seedr_password = self.app_config.get("seedr", "pass", fallback=None)

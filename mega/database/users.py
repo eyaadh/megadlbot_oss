@@ -34,3 +34,10 @@ class MegaUsers:
                 "$set": {"custom_thumbnail": thumb}
             }
         )
+
+    async def update_gdrive(self, user_id: int, key_file: typing.Union[bytes, str], key_location: str):
+        self.user_collection.update_one(
+            {"user_id": user_id}, {
+                "$set": {"gdrive_key": key_file, "gdrive_key_location": key_location}
+            }
+        )

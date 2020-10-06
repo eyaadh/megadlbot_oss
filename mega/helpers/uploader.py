@@ -212,9 +212,10 @@ class UploadFiles:
     @staticmethod
     async def handle_gdrive(file_msg: Message, ack_msg: Message, temp_file: str):
         gfile = await Gdrive().upload_file(ack_msg.chat.id, temp_file)
-        glink = f"https://drive.google.com/file/d/{gfile.get('id')}"
-        await file_msg.edit_text(
-            f"Here is the gdrive <a href={glink}> link</a>",
-            parse_mode="html",
-            disable_web_page_preview=True
-        )
+        if gfile:
+            glink = f"https://drive.google.com/file/d/{gfile.get('id')}"
+            await file_msg.edit_text(
+                f"Here is the gdrive <a href={glink}> link</a>",
+                parse_mode="html",
+                disable_web_page_preview=True
+            )

@@ -72,7 +72,7 @@ async def new_message_dl_handler(c: Client, m: Message):
                 disable_web_page_preview=True
             )
 
-        await url_process(m)
+            await url_process(m)
 
 
 async def url_process(m: Message):
@@ -91,7 +91,12 @@ async def url_process(m: Message):
         file_type_raw = header_info.get("Content-Type") if "Content-Type" in header_info else "None/None"
         file_type_split = file_type_raw.split("/")[0]
         file_content_disposition = header_info.get("content-disposition")
-        file_name_f_headers = re.findall("filename=(.+)", file_content_disposition)[0] if file_content_disposition else None
+        try:
+            file_name_f_headers = re.findall("filename=(.+)", file_content_disposition)[0] if file_content_disposition else None
+        except Exception as e:
+            logging.error(e)
+            file_name_f_headers = None
+
         file_ext_f_name = os.path.splitext(str(file_name_f_headers).replace('"', ""))[1]
 
         if header_info is None:

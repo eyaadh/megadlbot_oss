@@ -81,6 +81,8 @@ Agenda:
 17. Introduction of Torrents:
     - Introduction of Web API [x]
 
-   finally done with torrents, well added its support, now basically whats next should be uploading
-   these contents/downloaded stuff uncompressed... well until then, have a nice day!!! and stay healthy..
-   lets call it a video!!! I wish u all the best.
+18. Unzip/Extraction, Introduction to Google-Python-API and uploads to Google drive.
+    - Unzip/Extraction of torrent files uploaded [x]
+    - Authentication for Google API [x]
+    - Uploading Files to gDrive [x]
+    - Housekeeping of gDrive [x]

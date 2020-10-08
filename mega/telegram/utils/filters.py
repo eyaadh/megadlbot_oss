@@ -3,8 +3,7 @@ from pyrogram.types import CallbackQuery
 
 
 def callback_query(args: str, payload=True):
-    """
-    Accepts arg at all times.
+    """Accepts arg at all times.
 
     If payload is True, extract payload from callback and assign to callback.payload
     If payload is False, only check if callback exactly matches argument

@@ -20,8 +20,7 @@ seedr_status_progress = {}
 
 class SeedrAPI:
     def __init__(self):
-        """
-        SeedrAPI: to communicate with Seedr for torrent-ing.
+        """SeedrAPI: to communicate with Seedr for torrent-ing.
 
         add_url: Add a torrent file using a magnet/link. Returns with the json response from the endpoint.
 

@@ -12,6 +12,13 @@ from datetime import datetime, timedelta, timezone
 
 class Gdrive:
     def __init__(self):
+        """
+        upload_file: uploads the mentioned file to google drive, sets its permission to view for anyone with the link
+        and return with the shared link.
+
+        clean_old_files: query for files that has been modified 12hrs earlier and remove them from the google drive.
+        """
+
         self.scope = ["https://www.googleapis.com/auth/drive"]
 
     async def upload_file(self, user_id: int, mfile: str):

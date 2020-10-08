@@ -10,14 +10,6 @@ from mega.telegram.utils.custom_download import TGCustomYield, chunk_size, offse
 routes = web.RouteTableDef()
 
 
-@routes.get("/")
-async def root_route_handler(request):
-    bot_details = await MegaDLBot.get_me()
-    return web.json_response({"status": "running",
-                              "server_permission": "Limited" if len(Common().allowed_users) > 0 else "Open",
-                              "bot_associated_w": bot_details.username})
-
-
 @routes.get("/{message_id}")
 async def stream_handler(request):
     try:
@@ -40,7 +32,7 @@ async def media_streamer(request, message_id: int):
         until_bytes = int(until_bytes) if until_bytes else file_size
     else:
         from_bytes = request.http_range.start or 0
-        until_bytes = request.http_range.stop or file_size
+        until_bytes = request.http_range.strop or file_size
 
     req_length = until_bytes - from_bytes
 

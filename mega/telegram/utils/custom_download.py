@@ -21,8 +21,7 @@ async def offset_fix(offset, chunksize):
 
 class TGCustomYield:
     def __init__(self):
-        """
-        TGCustomYield: A custom method to stream files from telegram.
+        """TGCustomYield: A custom method to stream files from telegram.
 
         generate_file_properties: returns the properties for a media on a specific message.
 

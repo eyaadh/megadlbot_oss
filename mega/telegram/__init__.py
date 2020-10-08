@@ -1,6 +1,4 @@
-"""
-MegaDLBot Pyrogram Client
-"""
+"""MegaDLBot Pyrogram Client"""
 
 from pyrogram import Client
 from .utils import filters

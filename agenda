@@ -86,3 +86,14 @@ Agenda:
     - Authentication for Google API [x]
     - Uploading Files to gDrive [x]
     - Housekeeping of gDrive [x]
+
+19. Streaming Telegram files:
+so that is basically what is done, it looks complicated, however when once u understand the concept it is
+easy, in case you have any questions just jump by our status telegram group and there will always be
+someone around there to answer u... well the group is @megatronstatus... anyway, we will conclude the
+video here for today, on the next video we will investigate on a way to include this streaming link
+to the files that are uploaded, and if there is anything else to include that too....
+haha
+Have a nice day ahead... :-)
+    - Introduction of a webserver [x]
+    - Custom download method [x]

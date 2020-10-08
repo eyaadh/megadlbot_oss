@@ -1,3 +1,7 @@
+"""
+Basic console logging for the application
+"""
+
 import logging
 
 logging.basicConfig(

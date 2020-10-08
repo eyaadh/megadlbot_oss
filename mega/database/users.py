@@ -4,9 +4,9 @@ from mega.database import MegaDB
 
 class MegaUsers:
     def __init__(self):
-        """
-        MegaUsers is the mongo collection for the documents that holds the details of the users such as their
+        """MegaUsers is the mongo collection for the documents that holds the details of the users such as their
         download settings, gdrive and etc, for them users who uses the bot.
+
         insert_user: insert new documents, that contains the details of the new users who started using the bot.
 
         get_user: return the document that contains the user_id for the the given telegram user id.

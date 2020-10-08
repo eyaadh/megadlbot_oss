@@ -1,5 +1,5 @@
-"""MegaDB is the mongo DB connection for the application."""
 import pymongo
+
 from mega.common import Common
 
 

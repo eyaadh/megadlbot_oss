@@ -38,7 +38,7 @@ class Screens:
                 screen_process = await asyncio.create_subprocess_exec(*screen_cap_process_cmd,
                                                                       stdout=asyncio.subprocess.PIPE,
                                                                       stderr=asyncio.subprocess.PIPE)
-                _, err = await screen_process.communicate()
+                _, __ = await screen_process.communicate()
 
                 if os.path.isfile(tmp_file):
                     await msg.reply_photo(

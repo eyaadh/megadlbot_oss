@@ -21,19 +21,24 @@ seedr_status_progress = {}
 class SeedrAPI:
     def __init__(self):
         """
-        Interacts with Seedr user their API for torrent-ing.
+        SeedrAPI: to communicate with Seedr for torrent-ing.
 
-        functions:
-            add_url: Add a torrent file using a magnet/link. Returns with the json response from the endpoint.
-            get_torrent_details: returns with a json response that contains the details of a torrent that was added
-            using add_url method.
-            get_folder: returns with a json response that contains the list of folder contents and its details.
-            delete_folder: removes a specific folder from seedr using its folder_id
-            download_folder: download the folder and its content as a compressed file from seedr and finally start the
-            uploading process to telegram or otherwise extracting process.
-            uncompress_upload: extract and start uploading process to telegram for the contents of the compressed file
-            that was downloaded using download_folder.
+        add_url: Add a torrent file using a magnet/link. Returns with the json response from the endpoint.
+
+        get_torrent_details: returns with a json response that contains the details of a torrent that was added using
+        add_url method.
+
+        get_folder: returns with a json response that contains the list of folder contents and its details.
+
+        delete_folder: removes a specific folder from seedr using its folder_id
+
+        download_folder: download the folder and its content as a compressed file from seedr and finally start the
+        uploading process to telegram or otherwise extracting process.
+
+        uncompress_upload: extract and start uploading process to telegram for the contents of the compressed file
+        that was downloaded using download_folder.
         """
+
         self.web_dav = "https://www.seedr.cc/rest"
         self.username = Common().seedr_username
         self.password = Common().seedr_password

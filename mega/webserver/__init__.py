@@ -1,3 +1,7 @@
+"""
+web server to serve telegram files as Partial content or full content for streaming
+"""
+
 from aiohttp import web
 from mega.webserver.routes import routes
 

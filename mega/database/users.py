@@ -7,15 +7,18 @@ class MegaUsers:
         """
         MegaUsers is the mongo collection for the documents that holds the details of the users such as their
         download settings, gdrive and etc, for them users who uses the bot.
+        insert_user: insert new documents, that contains the details of the new users who started using the bot.
 
-        Functions:
-            insert_user: insert new documents, that contains the details of the new users who started using the bot.
-            get_user: return the document that contains the user_id for the the given telegram user id.
-            update_dld_settings: set/update the dld_settings field for the document with the given telegram user id.
-            update_cst_thumb: set/update the custom_thumbnail field for the document with the given telegram user id.
-            update_gdrive: set/update the gdrive_key and gdrive_key_location for the document with the given telegram
-            user id.
+        get_user: return the document that contains the user_id for the the given telegram user id.
+
+        update_dld_settings: set/update the dld_settings field for the document with the given telegram user id.
+
+        update_cst_thumb: set/update the custom_thumbnail field for the document with the given telegram user id.
+
+        update_gdrive: set/update the gdrive_key and gdrive_key_location for the document with the given telegram
+        user id.
         """
+
         self.user_collection = MegaDB().db["users"]
 
     async def insert_user(self, user_id: int):
@@ -51,12 +54,5 @@ class MegaUsers:
         self.user_collection.update_one(
             {"user_id": user_id}, {
                 "$set": {"gdrive_key": key_file, "gdrive_key_location": key_location}
-            }
-        )
-
-    async def update_yt_cookie(self, user_id: int, cookie_file: typing.Union[bytes, str], cookie_file_location: str):
-        self.user_collection.update_one(
-            {"user_id": user_id}, {
-                "$set": {"yt_cookie": cookie_file, "yt_cookie_location": cookie_file_location}
             }
         )

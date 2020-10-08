@@ -1,4 +1,7 @@
-"""MegaDLBot Pyrogram Client."""
+"""
+MegaDLBot Pyrogram Client
+"""
+
 from pyrogram import Client
 from .utils import filters
 from mega.common import Common

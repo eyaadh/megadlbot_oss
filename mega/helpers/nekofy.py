@@ -4,11 +4,9 @@ import aiohttp
 class Nekobin:
     def __init__(self):
         """
-        Interacts with the paste service Nekobin using its API.
-
-        functions:
-            nekofy: post a payload to nekobin.com using its API and return the link for saved paste page.
+        nekofy: post a payload to nekobin.com using its API and return the link for saved paste page.
         """
+
         self.neko_endpoint = "https://nekobin.com/api/documents"
 
     async def nekofy(self, payload_content: str):

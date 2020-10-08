@@ -7,7 +7,6 @@ from pyrogram import emoji, Client
 from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, ForceReply
 
 from mega.database.users import MegaUsers
-from mega.helpers.gdrive import Gdrive
 from .. import filters
 
 

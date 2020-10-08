@@ -17,7 +17,7 @@ class MediaInfo:
         process = await asyncio.create_subprocess_exec(*process_cmd, stdout=asyncio.subprocess.PIPE,
                                                        stderr=asyncio.subprocess.PIPE)
 
-        data, err = await process.communicate()
+        data, _ = await process.communicate()
         m_info = json.loads(data.decode("utf-8").rstrip())
 
         if m_info is None:

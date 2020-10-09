@@ -9,7 +9,7 @@ async def main():
     await MegaDLBot.start()
     runner = web.AppRunner(await web_server())
     await runner.setup()
-    await web.TCPSite(runner, "localhost", 8080).start()
+    await web.TCPSite(runner, "0.0.0.0", 8080).start()
     await idle()
 
 

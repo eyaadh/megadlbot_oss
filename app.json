@@ -63,6 +63,10 @@
         "SEEDR_PASSWORD":{
             "description": "Seedr Password",
             "required": true
+        },
+        "WEB_SERVER_FQDN":{
+            "description": "Fully Qualified Name for Webserver to stream files",
+            "required": true
         }
     },
     "buildpacks": [{

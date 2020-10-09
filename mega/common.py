@@ -29,6 +29,7 @@ class Common:
             self.seedr_password = os.environ.get("SEEDR_PASSWORD", None)
 
             self.web_port = os.getenv("PORT", 8080)
+            self.web_fqdn = os.environ.get("WEB_SERVER_FQDN", "0.0.0.0")
         else:
             self.app_config = configparser.ConfigParser()
 
@@ -54,4 +55,5 @@ class Common:
             self.seedr_username = self.app_config.get("seedr", "username", fallback=None)
             self.seedr_password = self.app_config.get("seedr", "pass", fallback=None)
 
-            self.web_port = self.app_config.get("web_server", "port", fallback=8080)
+            self.web_port = int(self.app_config.get("web_server", "port", fallback=8080))
+            self.web_fqdn = self.app_config.get("web_server", "fqdn", fallback="0.0.0.0")

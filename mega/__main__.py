@@ -1,3 +1,4 @@
+import logging
 import asyncio
 from aiohttp import web
 from pyrogram import idle
@@ -10,10 +11,14 @@ async def main():
     await MegaDLBot.start()
     runner = web.AppRunner(await web_server())
     await runner.setup()
-    await web.TCPSite(runner, "0.0.0.0", Common().web_port).start()
+    await web.TCPSite(runner, Common().web_fqdn, Common().web_port).start()
+    logging.info(f"Web Server Started at: {Common().web_fqdn}:{Common().web_port}")
     await idle()
 
 
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    try:
+        loop.run_until_complete(main())
+    except KeyboardInterrupt as e:
+        logging.error("KeyboardInterruption: Services Terminated!")

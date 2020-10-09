@@ -64,14 +64,6 @@
             "description": "Seedr Password",
             "required": true
         },
-        "WEB_SERVER_BIND_ADDRESS":{
-            "description": "Address with Web Server to bind with",
-            "required": true
-        },
-        "WEB_SERVER_PORT":{
-            "description": "Port for the Web Server to listen to",
-            "required": true
-        },
         "WEB_SERVER_FQDN":{
             "description": "Fully Qualified Name for Webserver to stream files",
             "required": true

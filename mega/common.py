@@ -6,7 +6,6 @@ import os
 class Common:
     def __init__(self):
         """Common: are commonly shared variables across the application that is loaded from the config file or env."""
-
         self.working_dir = "mega/working_dir"
 
         self.is_env = bool(os.environ.get("ENV", None))

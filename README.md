@@ -117,6 +117,11 @@ db_name = megadlbot
 #[seedr]
 #username = something@someone.com
 #pass = password
+
+# for the following section fill in the FQDN of the host machine and the port to bind for the webserver to stream files.
+[web_server]
+fqdn = localhost
+port = 8080
 ```
 
 ---

@@ -27,6 +27,8 @@ class Common:
             self.db_name = os.environ.get("DATABASE_DB_NAME")
             self.seedr_username = os.environ.get("SEEDR_USERNAME", None)
             self.seedr_password = os.environ.get("SEEDR_PASSWORD", None)
+
+            self.web_port = os.getenv("PORT", 8080)
         else:
             self.app_config = configparser.ConfigParser()
 
@@ -51,3 +53,5 @@ class Common:
 
             self.seedr_username = self.app_config.get("seedr", "username", fallback=None)
             self.seedr_password = self.app_config.get("seedr", "pass", fallback=None)
+
+            self.web_port = self.app_config.get("web_server", "port", fallback=8080)

@@ -32,7 +32,7 @@ async def media_streamer(request, message_id: int):
         until_bytes = int(until_bytes) if until_bytes else file_size
     else:
         from_bytes = request.http_range.start or 0
-        until_bytes = request.http_range.strop or file_size
+        until_bytes = request.http_range.stop or file_size
 
     req_length = until_bytes - from_bytes
 

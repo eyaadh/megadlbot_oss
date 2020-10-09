@@ -1,10 +1,10 @@
+"""MegaDB is the mongo DB connection for the application."""
 import pymongo
 from mega.common import Common
 
 
 class MegaDB:
     def __init__(self):
-        """MegaDB is the mongo DB connection for the application."""
         if Common().is_atlas:
             self.db_client = pymongo.MongoClient(
                 Common().db_host,

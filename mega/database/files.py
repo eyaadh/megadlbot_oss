@@ -4,12 +4,16 @@ from mega.database import MegaDB
 
 class MegaFiles:
     def __init__(self):
-        """MegaFiles is the mongo collection that holds the documents for the files that are uploaded via the bot.
-        insert_new_files: save new documents to the collection that contains details of the new files that are uploaded.
-        count_files_by_url: count and returns the number of documents for the file with the same url.
-        get_files_by_url: returns the documents for the files with a given url.
-        get_file_by_file_id: returns the document for the file with the given telegram file_id.
-        get_file_by_file_name: returns the documents for the files with the given file name.
+        """
+        MegaFiles is the mongo collection that holds the documents for the files that are uploaded via the bot.
+
+        Functions:
+            insert_new_files: save new documents to the collection that contains details of the new files that are
+            uploaded.
+            count_files_by_url: count and returns the number of documents for the file with the same url.
+            get_files_by_url: returns the documents for the files with a given url.
+            get_file_by_file_id: returns the document for the file with the given telegram file_id.
+            get_file_by_file_name: returns the documents for the files with the given file name.
         """
         self.files_collection = MegaDB().db['files']
 

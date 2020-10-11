@@ -1,9 +1,11 @@
 import asyncio
+import base64
 import json
 import logging
 import os
 import time
 
+import aiofiles
 import humanfriendly as size
 import youtube_dl
 from pyrogram.types import Message
@@ -11,6 +13,7 @@ from pyrogram.types import Message
 from mega.common import Common
 from mega.helpers.nekofy import Nekobin
 from mega.helpers.uploader import UploadFiles
+from mega.database.users import MegaUsers
 
 yt_progress_updates = {}
 
@@ -18,6 +21,14 @@ yt_progress_updates = {}
 class YTdl:
     @staticmethod
     async def extract(msg: Message, extraction_type: str):
+        user_details = await MegaUsers().get_user(msg.chat.id)
+        cookie_file_location = f"mega/{user_details['yt_cookie_location']}"
+
+        if "yt_cookie" in user_details:
+            if os.path.isfile(cookie_file_location) is not True:
+                async with aiofiles.open(cookie_file_location, mode='wb') as key_file_aio:
+                    await key_file_aio.write(base64.decodebytes(user_details["yt_cookie"]))
+
         ack_message = await msg.reply_text(
             "Trying to download the file to local!"
         )
@@ -41,6 +52,22 @@ class YTdl:
                     'preferredquality': '192',
                 }],
             }
+            if "yt_cookie" in user_details:
+                ytdl_options = {
+                    'format': 'bestaudio/best',
+                    'noplaylist': 'true',
+                    'outtmpl': f'{temp_dir}/%(title)s.%(ext)s',
+                    'progress_hooks': [YTdl().progress_hooks],
+                    'ignoreerrors': 'true',
+                    'source_address': '0.0.0.0',
+                    'cookiefile': cookie_file_location,
+                    'postprocessors': [{
+                        'key': 'FFmpegExtractAudio',
+                        'preferredcodec': 'mp3',
+                        'preferredquality': '192',
+                    }],
+                }
+
         elif extraction_type == "video":
             ytdl_options = {
                 'format': 'bestvideo[height<=480][ext=mp4]+bestaudio[height<=480][ext=m4a]/best',
@@ -50,6 +77,16 @@ class YTdl:
                 'ignoreerrors': 'true',
                 'source_address': '0.0.0.0'
             }
+            if "yt_cookie" in user_details:
+                ytdl_options = {
+                    'format': 'bestvideo[height<=480][ext=mp4]+bestaudio[height<=480][ext=m4a]/best',
+                    'noplaylist': 'true',
+                    'outtmpl': f'{temp_dir}/%(title)s.%(ext)s',
+                    'progress_hooks': [YTdl().progress_hooks],
+                    'ignoreerrors': 'true',
+                    'source_address': '0.0.0.0',
+                    'cookiefile': cookie_file_location
+                }
 
         yt_progress_updates[f"{msg.chat.id}{msg.message_id}"] = {
             "current": 0,
@@ -108,6 +145,9 @@ class YTdl:
 
     @staticmethod
     def ytdl_download(ytdl_options: dict, url: str):
+        youtube_dl.utils.std_headers['User-Agent'] = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) ' \
+                                                     'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 ' \
+                                                     'Safari/537.36 '
         with youtube_dl.YoutubeDL(ytdl_options) as ydl:
             ydl.download([url])
         return True

@@ -25,7 +25,9 @@ async def dld_settings_handler(c: Client, m: Message):
                 [InlineKeyboardButton(text=f"{emoji.VIDEO_CAMERA} Set a Custom Thumbnail",
                                       callback_data=f"thumbnail_{m.chat.id}")],
                 [InlineKeyboardButton(text=f"{emoji.OPEN_MAILBOX_WITH_RAISED_FLAG} Attach Google Drive",
-                                      callback_data=f"googleset_{m.chat.id}")]
+                                      callback_data=f"googleset_{m.chat.id}")],
+                [InlineKeyboardButton(text=f"{emoji.LABEL} Attach Youtube Cookie",
+                                      callback_data=f"cookie_{m.chat.id}")]
             ]
         )
     )
@@ -160,4 +162,47 @@ async def googleset_reply_msg_handler(c: Client, m: Message):
             await m.reply_text(
                 f"The key has been successfully attached. I will also provide you with a Gdrive link for the "
                 f"files you upload here on {emoji.HANDSHAKE}"
+            )
+
+
+@Client.on_callback_query(filters.callback_query("cookie"), group=5)
+async def ytcookie_cb_handler(c: Client, cb: CallbackQuery):
+    user_details = await MegaUsers().get_user(cb.message.chat.id)
+
+    if "yt_cookie" in user_details:
+        await c.send_message(
+            chat_id=cb.message.chat.id,
+            text=f"YTCK_{cb.message.message_id}\n"
+                 "You had already set a Youtube cookie, to replace it as a reply to this message send me the new "
+                 "cookie.txt file"
+        )
+    else:
+        await c.send_message(
+            chat_id=cb.message.chat.id,
+            text=f"YTCK_{cb.message.message_id}\n"
+                 "You have not given me a cookie.txt file as of yet. As a reply to this message, "
+                 "send me the cookie.txt file.",
+            reply_markup=ForceReply(True)
+        )
+
+
+@Client.on_message(filters.reply & filters.private & filters.document, group=4)
+async def ytcookie_reply_msg_handler(c: Client, m: Message):
+    func_message_obj = str(m.reply_to_message.text).splitlines()[0].split("_")
+    cookie_file = f"working_dir/{secrets.token_hex(2)}.txt"
+
+    if len(func_message_obj) > 1:
+        func = func_message_obj[0]
+
+        if func == "YTCK":
+            await c.download_media(message=m.document, file_name=cookie_file)
+
+            async with aiofiles.open(f"mega/{cookie_file}", mode='rb') as thumb:
+                base64_cookie = base64.b64encode(await thumb.read())
+
+            await MegaUsers().update_yt_cookie(m.from_user.id, base64_cookie, cookie_file)
+
+            await m.reply_text(
+                f"The cookie has been successfully attached. I will use this cookie for the YTDL Module "
+                f"{emoji.HANDSHAKE}"
             )

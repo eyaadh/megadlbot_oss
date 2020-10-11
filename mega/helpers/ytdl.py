@@ -22,10 +22,9 @@ class YTdl:
     @staticmethod
     async def extract(msg: Message, extraction_type: str):
         user_details = await MegaUsers().get_user(msg.chat.id)
-        cookie_file_location = ""
+        cookie_file_location = f"mega/{user_details['yt_cookie_location']}"
 
         if "yt_cookie" in user_details:
-            cookie_file_location = f"mega/{user_details['yt_cookie_location']}"
             if os.path.isfile(cookie_file_location) is not True:
                 async with aiofiles.open(cookie_file_location, mode='wb') as key_file_aio:
                     await key_file_aio.write(base64.decodebytes(user_details["yt_cookie"]))

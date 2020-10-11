@@ -53,3 +53,10 @@ class MegaUsers:
                 "$set": {"gdrive_key": key_file, "gdrive_key_location": key_location}
             }
         )
+
+    async def update_yt_cookie(self, user_id: int, cookie_file: typing.Union[bytes, str], cookie_file_location: str):
+        self.user_collection.update_one(
+            {"user_id": user_id}, {
+                "$set": {"yt_cookie": cookie_file, "yt_cookie_location": cookie_file_location}
+            }
+        )

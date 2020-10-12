@@ -8,7 +8,14 @@ TG_BOT_TOKEN = 3333333333333333
 TG_DUSTBIN_CHAT = -100122222222
 ALLOWED_USERS = [565315695,1234]
 
+
 # uncomment and fill your seedr credentials if you are to use seedr
 #[seedr]
 #SEEDR_USERNAME = something@someone.com
 #SEEDR_PASSWORD = password
+
+
+[web_server]
+bind_address = 0.0.0.0
+fqdn = localhost
+port = 8080

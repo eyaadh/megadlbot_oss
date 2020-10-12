@@ -19,6 +19,7 @@ from mega.telegram import MegaDLBot
 from mega.helpers.gdrive import Gdrive
 
 status_progress = {}
+msg_caption = ""
 
 
 class UploadFiles:
@@ -152,10 +153,22 @@ class UploadFiles:
 
     @staticmethod
     async def send_file_to_dustbin(file_message: Message, media_type: str, url: str):
+        global msg_caption
         fd_msg = await file_message.forward(
             chat_id=Common().bot_dustbin,
             as_copy=True
         )
+        file_link = f"https://{Common().web_fqdn}/{fd_msg.message_id}" if Common().on_heroku else \
+            f"http://{Common().web_fqdn}:{Common().web_port}/{fd_msg.message_id}"
+
+        msg_caption = f"Here is the Streaming <a href='{file_link}'>link</a> for this file."
+
+        await file_message.edit_text(
+            text=msg_caption,
+            parse_mode="html",
+            disable_web_page_preview=True
+        )
+
         if media_type == "video":
             await MegaFiles().insert_new_files(
                 filed_id=fd_msg.video.file_id,
@@ -211,11 +224,12 @@ class UploadFiles:
 
     @staticmethod
     async def handle_gdrive(file_msg: Message, ack_msg: Message, temp_file: str):
+        global msg_caption
         gfile = await Gdrive().upload_file(ack_msg.chat.id, temp_file)
         if gfile:
             glink = f"https://drive.google.com/file/d/{gfile.get('id')}"
             await file_msg.edit_text(
-                f"Here is the gdrive <a href={glink}> link</a>, this link might expire in 12hrs",
+                f"{msg_caption}\nHere is the gdrive <a href={glink}> link</a>, this link might expire in 12hrs",
                 parse_mode="html",
                 disable_web_page_preview=True
             )

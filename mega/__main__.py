@@ -11,9 +11,9 @@ async def main():
     await MegaDLBot.start()
     runner = web.AppRunner(await web_server())
     await runner.setup()
-    bind_address = "0.0.0.0" if Common().is_env else Common().web_fqdn
-    await web.TCPSite(runner, bind_address, Common().web_port).start()
-    logging.info(f"Web Server Started at: {bind_address}:{Common().web_port}")
+    await web.TCPSite(runner, Common().web_bind_address, Common().web_port).start()
+    logging.info(f"Web Server Started at: {Common().web_bind_address}:{Common().web_port} - FQDN: "
+                 f"{Common().web_fqdn}")
     await idle()
 
 

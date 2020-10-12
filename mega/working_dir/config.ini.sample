@@ -22,5 +22,6 @@ username = something@someone.com
 pass = password
 
 [web_server]
+bind_address = 0.0.0.0
 fqdn = localhost
 port = 8080

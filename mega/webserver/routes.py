@@ -10,6 +10,14 @@ from mega.telegram.utils.custom_download import TGCustomYield, chunk_size, offse
 routes = web.RouteTableDef()
 
 
+@routes.get("/")
+async def root_route_handler(request):
+    bot_details = await MegaDLBot.get_me()
+    return web.json_response({"status": "running",
+                              "server_permission": "Limited" if len(Common().allowed_users) > 0 else "Open",
+                              "bot_associated_w": bot_details.username})
+
+
 @routes.get("/{message_id}")
 async def stream_handler(request):
     try:

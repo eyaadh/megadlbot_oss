@@ -60,3 +60,10 @@ class MegaUsers:
                 "$set": {"yt_cookie": cookie_file, "yt_cookie_location": cookie_file_location}
             }
         )
+
+    async def update_file_rename_settings(self, user_id: int, dld_type: str):
+        self.user_collection.update_one(
+            {"user_id": user_id}, {
+                "$set": {"f_rename_type": dld_type}
+            }
+        )

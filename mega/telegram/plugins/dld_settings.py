@@ -233,6 +233,6 @@ async def settings_memory_file_rename_cb_handler(c: Client, cb: CallbackQuery):
 
 
 @Client.on_callback_query(filters.callback_query("drfnm"), group=5)
-async def settings_memory_file_rename_cb_handler(c: Client, cb: CallbackQuery):
+async def settings_disk_file_rename_cb_handler(c: Client, cb: CallbackQuery):
     await MegaUsers().update_file_rename_settings(cb.message.chat.id, "disk")
     await cb.answer("Updated user settings to Download files and write to disk for file renaming options.")

@@ -38,27 +38,30 @@ class Gdrive:
 
             service = build('drive', 'v3', credentials=credentials, cache_discovery=False)
             if file_type == "bytesIO":
+                mime_type = (mimetypes.guess_type(f_name))[0] if (mimetypes.guess_type(f_name))[0] is not None else \
+                    "application/octet-stream"
                 file_metadata = {
                     'name': f_name,
-                    'mimeType': (mimetypes.guess_type(f_name))[0],
+                    'mimeType': mime_type,
                 }
 
                 media = MediaIoBaseUpload(io.BytesIO(mfile),
-                                          mimetype=(mimetypes.guess_type(f_name))[0],
+                                          mimetype=mime_type,
                                           resumable=True)
                 gfile = service.files().create(body=file_metadata,
                                                media_body=media,
                                                fields='id').execute()
             else:
-
                 file_name = os.path.basename(mfile)
+                mime_type = (mimetypes.guess_type(file_name))[0] if (mimetypes.guess_type(file_name))[0] is not None else \
+                    "application/octet-stream"
                 file_metadata = {
                     'name': file_name,
-                    'mimeType': (mimetypes.guess_type(file_name))[0]
+                    'mimeType': mime_type
                 }
 
                 media = MediaFileUpload(mfile,
-                                        mimetype=(mimetypes.guess_type(file_name))[0],
+                                        mimetype=mime_type,
                                         resumable=True)
 
                 gfile = service.files().create(body=file_metadata,

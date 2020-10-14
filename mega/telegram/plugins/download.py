@@ -1,5 +1,6 @@
 import os
 import re
+import secrets
 import asyncio
 import logging
 import tldextract
@@ -406,6 +407,10 @@ async def call_seedr_download(msg: Message, torrent_type: str):
 
 @Client.on_message(filters.private & (filters.document | filters.video | filters.audio), group=4)
 async def media_receive_handler(c: Client, m: Message):
+    user_settings = await MegaUsers().get_user(m.from_user.id)
+    if "f_rename_type" not in user_settings:
+        await MegaUsers().update_file_rename_settings(m.from_user.id, "disk")
+
     await m.reply_text(
         text=f"FRNM_{m.message_id}\n"
              "Send me the new name of this file to rename it.",
@@ -415,15 +420,32 @@ async def media_receive_handler(c: Client, m: Message):
 
 @Client.on_message(filters.reply & filters.text, group=5)
 async def reply_media_rename_handler(c: Client, m: Message):
+    user_settings = await MegaUsers().get_user(m.from_user.id)
+
     func_message_obj = str(m.reply_to_message.text).splitlines()[0].split("_")
     if len(func_message_obj) > 1:
         func = func_message_obj[0]
         org_message_id = int(str(func_message_obj[1]).replace(":", ""))
         org_message = await c.get_messages(m.chat.id, org_message_id)
         ack_msg = await m.reply_text(
-            "About to download the file to memory and rename it."
+             "Processing to file to rename it."
         )
 
         if func == "FRNM":
-            m_file = await TGCustomYield().download_as_bytesio(org_message)
-            await UploadFiles().upload_file(m_file, ack_msg, "", "other", "bytesIO", m.text)
+            if "f_rename_type" in user_settings:
+                if user_settings["f_rename_type"] == "memory":
+                    m_file = await TGCustomYield().download_as_bytesio(org_message)
+                    await UploadFiles().upload_file(m_file, ack_msg, "", "other", "bytesIO", m.text)
+                else:
+                    temp_dir = f"working_dir/{secrets.token_hex(2)}"
+                    if not os.path.exists(f"mega/{temp_dir}"):
+                        os.mkdir(f"mega/{temp_dir}")
+
+                    m_file = f"{temp_dir}/{m.text}"
+
+                    await c.download_media(
+                        message=org_message,
+                        file_name=m_file
+                    )
+
+                    await UploadFiles().upload_file(f"mega/{m_file}", ack_msg, "", "other", "disk", m.text)

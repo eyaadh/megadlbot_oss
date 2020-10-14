@@ -212,7 +212,7 @@ class UploadFiles:
             disable_web_page_preview=True
         )
 
-        if f_type != "bytesIO":
+        if f_type != "bytesIO" and url != "":
             if media_type == "video":
                 await MegaFiles().insert_new_files(
                     filed_id=fd_msg.video.file_id,

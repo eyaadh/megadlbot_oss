@@ -1,11 +1,12 @@
 import os
+import io
 import base64
 import logging
 import aiofiles
 import mimetypes
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
-from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaFileUpload, MediaIoBaseUpload
 from mega.database.users import MegaUsers
 from datetime import datetime, timedelta, timezone
 
@@ -22,7 +23,7 @@ class Gdrive:
         """
         self.scope = ["https://www.googleapis.com/auth/drive"]
 
-    async def upload_file(self, user_id: int, mfile: str):
+    async def upload_file(self, user_id: int, mfile, file_type: str, f_name: str):
         user_details = await MegaUsers().get_user(user_id)
 
         if "gdrive_key" in user_details:
@@ -36,20 +37,33 @@ class Gdrive:
             )
 
             service = build('drive', 'v3', credentials=credentials, cache_discovery=False)
+            if file_type == "bytesIO":
+                file_metadata = {
+                    'name': f_name,
+                    'mimeType': (mimetypes.guess_type(f_name))[0],
+                }
 
-            file_name = os.path.basename(mfile)
-            file_metadata = {
-                'name': file_name,
-                'mimeType': (mimetypes.guess_type(file_name))[0]
-            }
+                media = MediaIoBaseUpload(io.BytesIO(mfile),
+                                          mimetype=(mimetypes.guess_type(f_name))[0],
+                                          resumable=True)
+                gfile = service.files().create(body=file_metadata,
+                                               media_body=media,
+                                               fields='id').execute()
+            else:
 
-            media = MediaFileUpload(mfile,
-                                    mimetype=(mimetypes.guess_type(file_name))[0],
-                                    resumable=True)
+                file_name = os.path.basename(mfile)
+                file_metadata = {
+                    'name': file_name,
+                    'mimeType': (mimetypes.guess_type(file_name))[0]
+                }
 
-            gfile = service.files().create(body=file_metadata,
-                                           media_body=media,
-                                           fields='id').execute()
+                media = MediaFileUpload(mfile,
+                                        mimetype=(mimetypes.guess_type(file_name))[0],
+                                        resumable=True)
+
+                gfile = service.files().create(body=file_metadata,
+                                               media_body=media,
+                                               fields='id').execute()
 
             service.permissions().create(body={"role": "reader", "type": "anyone"}, fileId=gfile.get("id")).execute()
             await Gdrive().clean_old_files(service)

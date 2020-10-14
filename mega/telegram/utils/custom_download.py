@@ -257,3 +257,88 @@ class TGCustomYield:
                 )
 
                 current_part += 1
+
+    async def download_as_bytesio(self, media_msg: Message):
+        client = self.main_bot
+        data = await self.generate_file_properties(media_msg)
+        media_session = await self.generate_media_session(client, media_msg)
+
+        file_ref = utils.decode_file_ref(data.file_ref)
+
+        if data.media_type == 1:
+            if data.peer_type == "user":
+                peer = raw.types.InputPeerUser(
+                    user_id=data.peer_id,
+                    access_hash=data.peer_access_hash
+                )
+            elif data.peer_type == "chat":
+                peer = raw.types.InputPeerChat(
+                    chat_id=data.peer_id
+                )
+            else:
+                peer = raw.types.InputPeerChannel(
+                    channel_id=data.peer_id,
+                    access_hash=data.peer_access_hash
+                )
+
+            location = raw.types.InputPeerPhotoFileLocation(
+                peer=peer,
+                volume_id=data.volume_id,
+                local_id=data.local_id,
+                big=data.is_big or None
+            )
+        elif data.media_type in (0, 2):
+            location = raw.types.InputPhotoFileLocation(
+                id=data.document_id,
+                access_hash=data.access_hash,
+                file_reference=file_ref,
+                thumb_size=data.thumb_size
+            )
+        elif data.media_type == 14:
+            location = raw.types.InputDocumentFileLocation(
+                id=data.document_id,
+                access_hash=data.access_hash,
+                file_reference=file_ref,
+                thumb_size=data.thumb_size
+            )
+        else:
+            location = raw.types.InputDocumentFileLocation(
+                id=data.document_id,
+                access_hash=data.access_hash,
+                file_reference=file_ref,
+                thumb_size=""
+            )
+
+        limit = 1024 * 1024
+        offset = 0
+
+        r = await media_session.send(
+            raw.functions.upload.GetFile(
+                location=location,
+                offset=offset,
+                limit=limit
+            )
+        )
+
+        if isinstance(r, raw.types.upload.File):
+            m_file = []
+            # m_file.name = file_name
+            while True:
+                chunk = r.bytes
+
+                if not chunk:
+                    break
+
+                m_file.append(chunk)
+
+                offset += limit
+
+                r = await media_session.send(
+                    raw.functions.upload.GetFile(
+                        location=location,
+                        offset=offset,
+                        limit=limit
+                    )
+                )
+
+            return m_file

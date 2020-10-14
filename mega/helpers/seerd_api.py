@@ -1,19 +1,17 @@
-import json
-import logging
 import os
-import secrets
+import json
 import time
 import shutil
-import zipfile
-
-import aiofiles
 import aiohttp
+import logging
+import secrets
+import zipfile
+import aiofiles
 import humanfriendly as size
-from pyrogram.errors import MessageNotModified
-from pyrogram.types import Message
-
 from mega.common import Common
+from pyrogram.types import Message
 from mega.helpers.uploader import UploadFiles
+from pyrogram.errors import MessageNotModified
 
 seedr_status_progress = {}
 
@@ -129,7 +127,7 @@ class SeedrAPI:
                                 logging.error(e)
 
         if upload_type != "compressed":
-            await UploadFiles().upload_file(dl_compressed_file, ack_message, org_message.text, "other")
+            await UploadFiles().upload_file(dl_compressed_file, ack_message, org_message.text, "other", "disk", "")
         else:
             await self.uncompress_upload(dl_compressed_file, ack_message, org_message)
 
@@ -164,7 +162,7 @@ class SeedrAPI:
                 text=f"Uploading {x} of {len(extracted_files)}",
                 parse_mode="html"
             )
-            await UploadFiles().upload_file(file, ack_msg, org_msg.text, "compressed")
+            await UploadFiles().upload_file(file, ack_msg, org_msg.text, "compressed", "disk", "")
 
         await ack_msg.delete()
 

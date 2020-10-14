@@ -1,19 +1,17 @@
-import asyncio
-import base64
-import json
-import logging
 import os
 import time
-
+import json
+import asyncio
+import base64
+import logging
 import aiofiles
-import humanfriendly as size
 import youtube_dl
-from pyrogram.types import Message
-
+import humanfriendly as size
 from mega.common import Common
+from pyrogram.types import Message
 from mega.helpers.nekofy import Nekobin
-from mega.helpers.uploader import UploadFiles
 from mega.database.users import MegaUsers
+from mega.helpers.uploader import UploadFiles
 
 yt_progress_updates = {}
 
@@ -107,7 +105,7 @@ class YTdl:
                     file_name = os.path.basename(temp_file)
                     pre, _ = os.path.splitext(file_name)
                     temp_file = os.path.join(temp_dir, f"{pre}.mp3")
-                await UploadFiles().upload_file(temp_file, ack_message, msg.text, "other")
+                await UploadFiles().upload_file(temp_file, ack_message, msg.text, "other", "disk", "")
                 break
             else:
                 await asyncio.sleep(1)

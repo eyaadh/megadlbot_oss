@@ -4,18 +4,21 @@ import asyncio
 import logging
 import tldextract
 import humanfriendly as size
-from pyrogram import emoji, Client
-from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ForceReply
-from pyrogram.errors import MessageNotModified
-from .. import filters
 from mega.common import Common
+from pyrogram import emoji, Client
+from mega.helpers.ytdl import YTdl
+from mega.helpers.screens import Screens
 from mega.database.files import MegaFiles
 from mega.database.users import MegaUsers
-from mega.helpers.downloader import Downloader
-from mega.helpers.media_info import MediaInfo
-from mega.helpers.screens import Screens
-from mega.helpers.ytdl import YTdl
 from mega.helpers.seerd_api import SeedrAPI
+from pyrogram.errors import MessageNotModified
+from mega.helpers.media_info import MediaInfo
+from mega.helpers.uploader import UploadFiles
+from mega.helpers.downloader import Downloader
+from mega.telegram.utils.custom_download import TGCustomYield
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ForceReply
+
+from .. import filters
 
 
 @Client.on_message(filters.private & filters.text, group=0)
@@ -47,7 +50,8 @@ async def new_message_dl_handler(c: Client, m: Message):
         elif m.text.startswith("magnet"):
             url_details = await MegaFiles().get_file_by_url(m.text)
             files = [
-                f"<a href='http://t.me/{me.username}?start=plf-{file['file_id']}'>{file['file_name']} - {file['file_type']}</a>"
+                f"<a href='http://t.me/{me.username}?start=plf-{file['file_id']}'>{file['file_name']}" \
+                f" - {file['file_type']}</a>"
                 for file in url_details
             ]
             files_msg_formatted = '\n'.join(files)
@@ -61,7 +65,8 @@ async def new_message_dl_handler(c: Client, m: Message):
         else:
             url_details = await MegaFiles().get_file_by_url(m.text)
             files = [
-                f"<a href='http://t.me/{me.username}?start=plf-{file['file_id']}'>{file['file_name']} - {file['file_type']}</a>"
+                f"<a href='http://t.me/{me.username}" \
+                f"?start=plf-{file['file_id']}'>{file['file_name']} - {file['file_type']}</a>"
                 for file in url_details
             ]
             files_msg_formatted = '\n'.join(files)
@@ -92,7 +97,8 @@ async def url_process(m: Message):
         file_type_split = file_type_raw.split("/")[0]
         file_content_disposition = header_info.get("content-disposition")
         try:
-            file_name_f_headers = re.findall("filename=(.+)", file_content_disposition)[0] if file_content_disposition else None
+            file_name_f_headers = re.findall("filename=(.+)", file_content_disposition)[
+                0] if file_content_disposition else None
         except Exception as e:
             logging.error(e)
             file_name_f_headers = None
@@ -396,3 +402,28 @@ async def call_seedr_download(msg: Message, torrent_type: str):
             f"An error occurred:\n<pre>{error}</pre>",
             parse_mode="html"
         )
+
+
+@Client.on_message(filters.private & (filters.document | filters.video | filters.audio), group=4)
+async def media_receive_handler(c: Client, m: Message):
+    await m.reply_text(
+        text=f"FRNM_{m.message_id}\n"
+             "Send me the new name of this file to rename it.",
+        reply_markup=ForceReply(True)
+    )
+
+
+@Client.on_message(filters.reply & filters.text, group=5)
+async def reply_media_rename_handler(c: Client, m: Message):
+    func_message_obj = str(m.reply_to_message.text).splitlines()[0].split("_")
+    if len(func_message_obj) > 1:
+        func = func_message_obj[0]
+        org_message_id = int(str(func_message_obj[1]).replace(":", ""))
+        org_message = await c.get_messages(m.chat.id, org_message_id)
+        ack_msg = await m.reply_text(
+            "About to download the file to memory and rename it."
+        )
+
+        if func == "FRNM":
+            m_file = await TGCustomYield().download_as_bytesio(org_message)
+            await UploadFiles().upload_file(m_file, ack_msg, "", "other", "bytesIO", m.text)

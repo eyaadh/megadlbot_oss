@@ -1,20 +1,19 @@
-import asyncio
-import logging
-import mimetypes
 import os
-import secrets
 import time
 import typing
-import urllib.parse
-
-import aiofiles
 import aiohttp
+import secrets
+import asyncio
+import logging
+import aiofiles
+import mimetypes
+import urllib.parse
 import humanfriendly as size
-from pyrogram.errors import MessageNotModified, FloodWait
 from pyrogram.types import Message
-
-from mega.helpers.uploader import UploadFiles
 from mega.telegram import MegaDLBot
+from mega.helpers.uploader import UploadFiles
+from pyrogram.errors import MessageNotModified, FloodWait
+
 
 status_progress = {}
 
@@ -68,4 +67,4 @@ class Downloader:
 
                             status_progress[f"{ack_message.chat.id}{ack_message.message_id}"][
                                 "last_download_updated"] = time.time()
-        await UploadFiles().upload_file(temp_file, ack_message, url, "other")
+        await UploadFiles().upload_file(temp_file, ack_message, url, "other", "disk", "")

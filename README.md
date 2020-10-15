@@ -118,8 +118,9 @@ db_name = megadlbot
 #username = something@someone.com
 #pass = password
 
-# for the following section fill in the FQDN of the host machine and the port to bind for the webserver to stream files.
+# for the following section fill in the FQDN with which end users can reach the host machine, bindaddress is the address of the adapter to bind with while running webserver and the port for the webserver to listen.
 [web_server]
+bind_address = 0.0.0.0
 fqdn = localhost
 port = 8080
 ```

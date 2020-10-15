@@ -22,6 +22,9 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, 
 from .. import filters
 
 
+youtube_dl_links = ["youtube", "youtu", "facebook", "soundcloud"]
+
+
 @Client.on_message(filters.private & filters.text, group=0)
 async def new_message_dl_handler(c: Client, m: Message):
     await MegaUsers().insert_user(m.from_user.id)
@@ -110,7 +113,7 @@ async def url_process(m: Message):
             await m.reply_text(
                 f"I do not know the details of the file to download the file! {emoji.MAN_RAISING_HAND_DARK_SKIN_TONE}"
             )
-        elif (tldextract.extract(m.text)).domain != "youtube":
+        elif (tldextract.extract(m.text)).domain not in youtube_dl_links:
             file_size = header_info.get("Content-Length") if "Content-Length" in header_info else None
             if file_size is not None and int(file_size) > 2147483648:
                 await m.reply_text(
@@ -142,7 +145,7 @@ async def url_process(m: Message):
                     reply_markup=InlineKeyboardMarkup(inline_buttons)
                 )
 
-        elif (tldextract.extract(m.text)).domain == "youtube":
+        elif (tldextract.extract(m.text)).domain in youtube_dl_links:
             inline_buttons = [
                 [
                     InlineKeyboardButton(text=f"{emoji.LOUDSPEAKER} Extract Audio",

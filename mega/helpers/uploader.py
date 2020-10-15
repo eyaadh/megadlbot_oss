@@ -9,8 +9,10 @@ import asyncio
 import aiofiles
 import mimetypes
 import humanfriendly as size
+from pyrogram import emoji
+
 from mega.common import Common
-from pyrogram.types import Message
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from mega.telegram import MegaDLBot
 from mega.helpers.gdrive import Gdrive
 from mega.database.files import MegaFiles
@@ -18,7 +20,7 @@ from mega.database.users import MegaUsers
 from pyrogram.errors import MessageNotModified, FloodWait
 
 status_progress = {}
-msg_caption = ""
+file_link = ""
 
 
 class UploadFiles:
@@ -196,7 +198,7 @@ class UploadFiles:
 
     @staticmethod
     async def send_file_to_dustbin(file_message: Message, media_type: str, url: str, f_type: str):
-        global msg_caption
+        global file_link
         fd_msg = await file_message.forward(
             chat_id=Common().bot_dustbin,
             as_copy=True
@@ -204,12 +206,12 @@ class UploadFiles:
         file_link = f"https://{Common().web_fqdn}/{fd_msg.message_id}" if Common().on_heroku else \
             f"http://{Common().web_fqdn}:{Common().web_port}/{fd_msg.message_id}"
 
-        msg_caption = f"Here is the Streaming <a href='{file_link}'>link</a> for this file."
-
-        await file_message.edit_text(
-            text=msg_caption,
-            parse_mode="html",
-            disable_web_page_preview=True
+        await file_message.edit_reply_markup(
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [InlineKeyboardButton(text=f"{emoji.ROCKET} Streaming Link", url=file_link)]
+                ]
+            )
         )
 
         if f_type != "bytesIO" and url != "":
@@ -269,13 +271,16 @@ class UploadFiles:
 
     @staticmethod
     async def handle_gdrive(file_msg: Message, ack_msg: Message, temp_file: str, f_type: str, f_name: str):
-        global msg_caption
+        global file_link
 
         gfile = await Gdrive().upload_file(ack_msg.chat.id, temp_file, f_type, f_name)
         if gfile:
             glink = f"https://drive.google.com/file/d/{gfile.get('id')}"
-            await file_msg.edit_text(
-                f"{msg_caption}\nHere is the gdrive <a href={glink}> link</a>, this link might expire in 12hrs",
-                parse_mode="html",
-                disable_web_page_preview=True
+            await file_msg.edit_reply_markup(
+                reply_markup=InlineKeyboardMarkup(
+                    [
+                        [InlineKeyboardButton(text=f"{emoji.ROCKET} Streaming Link", url=file_link)],
+                        [InlineKeyboardButton(text=f"{emoji.CLOUD} Google Drive Link", url=glink)]
+                    ]
+                )
             )

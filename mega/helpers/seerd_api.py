@@ -163,10 +163,15 @@ class SeedrAPI:
         x = 0
         for file in extracted_files:
             x = x + 1
-            await ack_msg.edit_text(
-                text=f"Uploading {x} of {len(extracted_files)}",
-                parse_mode="html"
-            )
+            try:
+                await ack_msg.edit_text(
+                    text=f"Uploading {x} of {len(extracted_files)}",
+                    parse_mode="html"
+                )
+            except MessageNotModified as e:
+                logging.error(str(e))
+            except Exception as e:
+                logging.error(str(e))
             await UploadFiles().upload_file(file, ack_msg, org_msg.text, "compressed", "disk", "")
 
         await ack_msg.delete()

@@ -28,6 +28,8 @@ async def dld_settings_handler(c: Client, m: Message):
                                       callback_data=f"googleset_{m.chat.id}")],
                 [InlineKeyboardButton(text=f"{emoji.LABEL} Attach Youtube Cookie",
                                       callback_data=f"cookie_{m.chat.id}")],
+                [InlineKeyboardButton(text=f"{emoji.MAGNET} Seedr Settings",
+                                      callback_data=f"seed_{m.chat.id}")],
                 [InlineKeyboardButton(text=f"{emoji.PEN} File Rename Settings",
                                       callback_data=f"filernm_{m.chat.id}")]
             ]
@@ -236,3 +238,60 @@ async def settings_memory_file_rename_cb_handler(c: Client, cb: CallbackQuery):
 async def settings_disk_file_rename_cb_handler(c: Client, cb: CallbackQuery):
     await MegaUsers().update_file_rename_settings(cb.message.chat.id, "disk")
     await cb.answer("Updated user settings to Download files and write to disk for file renaming options.")
+
+
+@Client.on_callback_query(filters.callback_query("seed"), group=5)
+async def seed_root_cb_handler(c: Client, cb: CallbackQuery):
+    await cb.answer()
+    user_details = await MegaUsers().get_user(cb.message.chat.id)
+
+    if ('seedr_username' not in user_details) or ('seedr_passwd' not in user_details):
+        await c.send_message(
+            chat_id=cb.message.chat.id,
+            text=f"SDSU_{cb.message.message_id}\n"
+                 "You have not set any seedr settings with me, as a reply to this message send me seedr username.",
+            reply_markup=ForceReply(True)
+        )
+    else:
+        await cb.message.edit_reply_markup(
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [InlineKeyboardButton(text=f"{emoji.GEAR} Update Seedr Credentials",
+                                          callback_data=f"stsed_{cb.message.chat.id}")],
+                ]
+            )
+        )
+
+
+@Client.on_message(filters.reply & filters.private & filters.text, group=4)
+async def seed_reply_msg_handler(c: Client, m: Message):
+    func_message_obj = str(m.reply_to_message.text).splitlines()[0].split("_")
+
+    if len(func_message_obj) > 1:
+        func = func_message_obj[0]
+
+        if func == "SDSU":
+            await m.reply_text(
+                text=f"SDSP_{m.message_id}\n"
+                     "Now as a reply to this message send me the seedr password.",
+                reply_markup=ForceReply(True)
+            )
+
+            await MegaUsers().update_seedr_username(m.from_user.id, m.text)
+
+        elif func == "SDSP":
+            await MegaUsers().update_seedr_paswd(m.from_user.id, m.text)
+            await m.reply_to_message.delete()
+            await m.delete()
+            await m.reply_text("Successfully Updated Seedr Settings.")
+
+
+@Client.on_callback_query(filters.callback_query("stsed"), group=5)
+async def settings_disk_file_rename_cb_handler(c: Client, cb: CallbackQuery):
+    await cb.answer()
+    await c.send_message(
+        chat_id=cb.message.chat.id,
+        text=f"SDSU_{cb.message.message_id}\n"
+             "As a reply to this message send me the new username for seedr.",
+        reply_markup=ForceReply(True)
+    )

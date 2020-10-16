@@ -10,6 +10,7 @@ import aiofiles
 import humanfriendly as size
 from mega.common import Common
 from pyrogram.types import Message
+from mega.database.users import MegaUsers
 from mega.helpers.uploader import UploadFiles
 from pyrogram.errors import MessageNotModified
 
@@ -33,10 +34,9 @@ class SeedrAPI:
             that was downloaded using download_folder.
         """
         self.web_dav = "https://www.seedr.cc/rest"
-        self.username = Common().seedr_username
-        self.password = Common().seedr_password
 
-    async def add_url(self, url: str, link_type: str):
+    async def add_url(self, url: str, link_type: str, user_id: int):
+        user_details = await MegaUsers().get_user(user_id)
         async with aiohttp.ClientSession() as seedr_session:
             endpoint = f"{self.web_dav}/torrent/magnet" if link_type == "magnet" else f"{self.web_dav}/torrent/url"
             data = {"magnet": url} if link_type == "magnet" else {"torrent_url": url}
@@ -44,55 +44,60 @@ class SeedrAPI:
                     url=endpoint,
                     data=data,
                     auth=aiohttp.BasicAuth(
-                        self.username,
-                        self.password
+                        user_details["seedr_username"],
+                        user_details["seedr_passwd"]
                     )
             ) as resp:
                 return json.loads(await resp.text())
 
-    async def get_torrent_details(self, torrent_id: str):
+    async def get_torrent_details(self, torrent_id: str, user_id: int):
+        user_details = await MegaUsers().get_user(user_id)
         async with aiohttp.ClientSession() as seedr_session:
             endpoint = f"{self.web_dav}/torrent/{torrent_id}"
             async with seedr_session.get(
                     url=endpoint,
                     auth=aiohttp.BasicAuth(
-                        self.username,
-                        self.password
+                        user_details["seedr_username"],
+                        user_details["seedr_passwd"]
                     )
             ) as resp:
                 return json.loads(await resp.text())
 
-    async def get_folder(self, folder_id: str):
+    async def get_folder(self, folder_id: str, user_id: int):
+        user_details = await MegaUsers().get_user(user_id)
         async with aiohttp.ClientSession() as seedr_session:
             endpoint = f"{self.web_dav}/folder/{folder_id}"
             async with seedr_session.get(
                     url=endpoint,
                     auth=aiohttp.BasicAuth(
-                        self.username,
-                        self.password
+                        user_details["seedr_username"],
+                        user_details["seedr_passwd"]
                     )
             ) as resp:
                 return json.loads(await resp.text())
 
-    async def delete_folder(self, folder_id: str):
+    async def delete_folder(self, folder_id: str, user_id: int):
+        user_details = await MegaUsers().get_user(user_id)
         async with aiohttp.ClientSession() as seedr_session:
             endpoint = f"{self.web_dav}/folder/{folder_id}"
             async with seedr_session.delete(
                     url=endpoint,
                     auth=aiohttp.BasicAuth(
-                        self.username,
-                        self.password
+                        user_details["seedr_username"],
+                        user_details["seedr_passwd"]
                     )
             ) as resp:
                 return json.loads(await resp.text())
 
     async def download_folder(self, folder_id: str, ack_message: Message, org_message: Message, upload_type: str):
         endpoint = f"{self.web_dav}/folder/{folder_id}/download"
+        user_details = await MegaUsers().get_user(org_message.chat.id)
+
         temp_dir = os.path.join(Common().working_dir, secrets.token_hex(2))
         if not os.path.exists(temp_dir):
             os.mkdir(temp_dir)
 
-        folder_details = await self.get_folder(folder_id)
+        folder_details = await self.get_folder(folder_id, org_message.chat.id)
         dl_folder_name = f"{folder_details['name']}.zip"
         dl_compressed_file = os.path.join(temp_dir, dl_folder_name)
         await ack_message.edit_reply_markup(None)
@@ -103,8 +108,8 @@ class SeedrAPI:
             async with seedr_session.get(
                     url=endpoint,
                     auth=aiohttp.BasicAuth(
-                        self.username,
-                        self.password
+                        user_details["seedr_username"],
+                        user_details["seedr_passwd"]
                     )
             ) as resp:
                 async with aiofiles.open(dl_compressed_file, mode="wb") as fd:

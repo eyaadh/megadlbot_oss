@@ -67,3 +67,17 @@ class MegaUsers:
                 "$set": {"f_rename_type": dld_type}
             }
         )
+
+    async def update_seedr_username(self, user_id: int, seedr_username: str):
+        self.user_collection.update_one(
+            {"user_id": user_id}, {
+                "$set": {"seedr_username": seedr_username}
+            }
+        )
+
+    async def update_seedr_paswd(self, user_id: int, seedr_passwd: str):
+        self.user_collection.update_one(
+            {"user_id": user_id}, {
+                "$set": {"seedr_passwd": seedr_passwd}
+            }
+        )

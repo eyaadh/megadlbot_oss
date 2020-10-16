@@ -26,8 +26,6 @@ class Common:
             self.db_username = os.environ.get("DATABASE_DB_USERNAME")
             self.db_password = os.environ.get("DATABASE_DB_PASSWORD")
             self.db_name = os.environ.get("DATABASE_DB_NAME")
-            self.seedr_username = os.environ.get("SEEDR_USERNAME", None)
-            self.seedr_password = os.environ.get("SEEDR_PASSWORD", None)
 
             self.web_port = os.environ.get("WEB_SERVER_PORT", 8080)
             if 'DYNO' in os.environ:
@@ -56,9 +54,6 @@ class Common:
             self.db_username = self.app_config.get("database", "db_username", fallback=None)
             self.db_password = self.app_config.get("database", "db_password", fallback=None)
             self.db_name = self.app_config.get("database", "db_name")
-
-            self.seedr_username = self.app_config.get("seedr", "username", fallback=None)
-            self.seedr_password = self.app_config.get("seedr", "pass", fallback=None)
 
             self.web_bind_address = self.app_config.get("web_server", "bind_address", fallback="0.0.0.0")
             self.web_port = int(self.app_config.get("web_server", "port", fallback=8080))

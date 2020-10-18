@@ -415,8 +415,34 @@ async def media_receive_handler(c: Client, m: Message):
     if "f_rename_type" not in user_settings:
         await MegaUsers().update_file_rename_settings(m.from_user.id, "disk")
 
+    fd_msg = await m.forward(
+        chat_id=Common().bot_dustbin
+    )
+
+    file_link = f"https://{Common().web_fqdn}/{fd_msg.message_id}" if Common().on_heroku else \
+        f"http://{Common().web_fqdn}:{Common().web_port}/{fd_msg.message_id}"
+
     await m.reply_text(
-        text=f"FRNM_{m.message_id}\n"
+        text=f"What would you like to do with this file?",
+        reply_markup=InlineKeyboardMarkup(
+            [
+                [InlineKeyboardButton(text=f"{emoji.ROCKET} Streaming Link", url=file_link)],
+                [InlineKeyboardButton(text=f"{emoji.PEN} Rename File",
+                                      callback_data=f"prflrn_{m.chat.id}_{m.message_id}")]
+            ]
+        )
+    )
+
+
+@Client.on_callback_query(filters.callback_query("prflrn"), group=1)
+async def callback_file_rename_proc_handler(c: Client, cb: CallbackQuery):
+    await cb.answer()
+
+    params = cb.payload.split('_')
+    cb_message_id = int(params[1]) if len(params) > 1 else None
+
+    await cb.message.reply_text(
+        text=f"FRNM_{cb_message_id}\n"
              "Send me the new name of this file to rename it.",
         reply_markup=ForceReply(True)
     )

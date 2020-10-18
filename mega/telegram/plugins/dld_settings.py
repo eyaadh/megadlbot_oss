@@ -222,7 +222,7 @@ async def file_rename_cb_handler(c: Client, cb: CallbackQuery):
                 [InlineKeyboardButton(text=f"{emoji.HOURGLASS_NOT_DONE} Memory Downloads for Rename",
                                       callback_data=f"mfrnm_{cb.message.chat.id}")],
                 [InlineKeyboardButton(text=f"{emoji.COMPUTER_DISK} Write to Disk for Rename",
-                                      callback_data=f"drfnm_{cb.message.chat.id}")]
+                                      callback_data=f"drfrnm_{cb.message.chat.id}")]
             ]
         )
     )
@@ -234,8 +234,8 @@ async def settings_memory_file_rename_cb_handler(c: Client, cb: CallbackQuery):
     await cb.answer("Updated user settings to Download files to Memory for file renaming options.")
 
 
-@Client.on_callback_query(filters.callback_query("drfnm"), group=5)
-async def settings_disk_file_rename_cb_handler(c: Client, cb: CallbackQuery):
+@Client.on_callback_query(filters.callback_query("drfrnm"), group=4)
+async def settings_file_rename_disk_cb_handler(c: Client, cb: CallbackQuery):
     await MegaUsers().update_file_rename_settings(cb.message.chat.id, "disk")
     await cb.answer("Updated user settings to Download files and write to disk for file renaming options.")
 
@@ -287,7 +287,7 @@ async def seed_reply_msg_handler(c: Client, m: Message):
 
 
 @Client.on_callback_query(filters.callback_query("stsed"), group=5)
-async def settings_disk_file_rename_cb_handler(c: Client, cb: CallbackQuery):
+async def settings_seedr_credentials_cb_handler(c: Client, cb: CallbackQuery):
     await cb.answer()
     await c.send_message(
         chat_id=cb.message.chat.id,

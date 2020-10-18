@@ -170,16 +170,8 @@ class TGCustomYield:
 
         return media_session
 
-    async def yield_file(self, media_msg: Message, offset: int, first_part_cut: int,
-                         last_part_cut: int, part_count: int, chunk_size: int) -> Union[str, None]:
-        client = self.main_bot
-        data = await self.generate_file_properties(media_msg)
-        media_session = await self.generate_media_session(client, media_msg)
-
-        current_part = 1
-
-        file_ref = utils.decode_file_ref(data.file_ref)
-
+    @staticmethod
+    async def get_location(data, file_ref):
         if data.media_type == 1:
             if data.peer_type == "user":
                 peer = raw.types.InputPeerUser(
@@ -223,6 +215,20 @@ class TGCustomYield:
                 file_reference=file_ref,
                 thumb_size=""
             )
+
+        return location
+
+    async def yield_file(self, media_msg: Message, offset: int, first_part_cut: int,
+                         last_part_cut: int, part_count: int, chunk_size: int) -> Union[str, None]:
+        client = self.main_bot
+        data = await self.generate_file_properties(media_msg)
+        media_session = await self.generate_media_session(client, media_msg)
+
+        current_part = 1
+
+        file_ref = utils.decode_file_ref(data.file_ref)
+
+        location = await self.get_location(data, file_ref)
 
         r = await media_session.send(
             raw.functions.upload.GetFile(
@@ -263,49 +269,7 @@ class TGCustomYield:
 
         file_ref = utils.decode_file_ref(data.file_ref)
 
-        if data.media_type == 1:
-            if data.peer_type == "user":
-                peer = raw.types.InputPeerUser(
-                    user_id=data.peer_id,
-                    access_hash=data.peer_access_hash
-                )
-            elif data.peer_type == "chat":
-                peer = raw.types.InputPeerChat(
-                    chat_id=data.peer_id
-                )
-            else:
-                peer = raw.types.InputPeerChannel(
-                    channel_id=data.peer_id,
-                    access_hash=data.peer_access_hash
-                )
-
-            location = raw.types.InputPeerPhotoFileLocation(
-                peer=peer,
-                volume_id=data.volume_id,
-                local_id=data.local_id,
-                big=data.is_big or None
-            )
-        elif data.media_type in (0, 2):
-            location = raw.types.InputPhotoFileLocation(
-                id=data.document_id,
-                access_hash=data.access_hash,
-                file_reference=file_ref,
-                thumb_size=data.thumb_size
-            )
-        elif data.media_type == 14:
-            location = raw.types.InputDocumentFileLocation(
-                id=data.document_id,
-                access_hash=data.access_hash,
-                file_reference=file_ref,
-                thumb_size=data.thumb_size
-            )
-        else:
-            location = raw.types.InputDocumentFileLocation(
-                id=data.document_id,
-                access_hash=data.access_hash,
-                file_reference=file_ref,
-                thumb_size=""
-            )
+        location = await self.get_location(data, file_ref)
 
         limit = 1024 * 1024
         offset = 0

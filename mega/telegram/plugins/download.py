@@ -19,7 +19,7 @@ from mega.helpers.downloader import Downloader
 from mega.telegram.utils.custom_download import TGCustomYield
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, ForceReply
 
-from .. import filters
+from ..utils import filters
 
 youtube_dl_links = ["youtube", "youtu", "facebook", "soundcloud"]
 

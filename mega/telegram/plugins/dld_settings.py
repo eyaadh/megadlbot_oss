@@ -7,7 +7,7 @@ from pyrogram import emoji, Client
 from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, ForceReply
 
 from mega.database.users import MegaUsers
-from .. import filters
+from ..utils import filters
 
 
 @Client.on_message(filters.command("dldsettings", prefixes=["/"]))

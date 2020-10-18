@@ -14,20 +14,23 @@ from mega.telegram import MegaDLBot
 from mega.helpers.uploader import UploadFiles
 from pyrogram.errors import MessageNotModified, FloodWait
 
-
 status_progress = {}
 
 
 class Downloader:
     @staticmethod
     async def get_headers(url: str):
-        async with aiohttp.ClientSession() as mega_session:
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(
+            verify_ssl=False, limit=1
+        )) as mega_session:
             async with mega_session.get(url) as resp:
                 return resp.headers
 
     @staticmethod
     async def download_file(url: str, ack_message: Message, new_file_name: typing.Union[None, str]):
-        async with aiohttp.ClientSession() as mega_session:
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(
+            verify_ssl=False, limit=1
+        )) as mega_session:
             async with mega_session.get(url) as resp:
                 temp_dir = f"mega/working_dir/{secrets.token_hex(2)}"
                 if not os.path.exists(temp_dir):

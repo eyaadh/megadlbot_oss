@@ -130,15 +130,6 @@ class YTdl:
                     int(d["total_bytes"]), binary=True
                 )
                 yt_progress_updates[f"{chat_id}{message_id}"]["file_name"] = d["filename"]
-            if d["status"] == "finished":
-                # do we need to do this though, anyway to be on a safe side lets keep it too..
-                yt_progress_updates[f"{chat_id}{message_id}"]["current"] = size.format_size(
-                    int(d["downloaded_bytes"]), binary=True
-                )
-                yt_progress_updates[f"{chat_id}{message_id}"]["total"] = size.format_size(
-                    int(d["total_bytes"]), binary=True
-                )
-                yt_progress_updates[f"{chat_id}{message_id}"]["file_name"] = d["filename"]
         except Exception as e:
             logging.error(e)
 

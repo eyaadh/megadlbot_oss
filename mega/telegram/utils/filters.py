@@ -1,6 +1,5 @@
-from pyrogram.filters import create
+from pyrogram.filters import *
 from pyrogram.types import CallbackQuery
-import re
 
 def callback_query(args: str, payload=True):
     """ Accepts arg at all times.

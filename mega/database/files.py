@@ -4,9 +4,7 @@ from mega.database import MegaDB
 
 class MegaFiles:
     def __init__(self):
-        """
-        MegaFiles is the mongo collection that holds the documents for the files that are uploaded via the bot.
-
+        """ MegaFiles is the mongo collection that holds the documents for the files that are uploaded via the bot.
         Functions:
             insert_new_files: save new documents to the collection that contains details of the new files that are
             uploaded.

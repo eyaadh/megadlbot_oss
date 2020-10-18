@@ -19,9 +19,7 @@ seedr_status_progress = {}
 
 class SeedrAPI:
     def __init__(self):
-        """
-        Interacts with Seedr user their API for torrent-ing.
-
+        """ Interacts with Seedr user their API for torrent-ing.
         functions:
             add_url: Add a torrent file using a magnet/link. Returns with the json response from the endpoint.
             get_torrent_details: returns with a json response that contains the details of a torrent that was added

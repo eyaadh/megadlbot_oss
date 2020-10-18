@@ -4,6 +4,7 @@ from mega.common import Common
 
 
 class MegaDB:
+    """Database init""" 
     def __init__(self):
         if Common().is_atlas:
             self.db_client = pymongo.MongoClient(

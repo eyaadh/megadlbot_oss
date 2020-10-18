@@ -21,9 +21,7 @@ async def offset_fix(offset, chunksize):
 
 class TGCustomYield:
     def __init__(self):
-        """
-        A custom method to stream files from telegram.
-
+        """ A custom method to stream files from telegram.
         functions:
             generate_file_properties: returns the properties for a media on a specific message.
             generate_media_session: returns the media session for the DC that contains the media file on the message.
@@ -76,7 +74,7 @@ class TGCustomYield:
 
             if media_type == 1:
                 unpacked = struct.unpack("<iiqqqiiiqi", decoded)
-                dc_id, photo_id, _, volume_id, size_type, peer_id, x, peer_access_hash, local_id = unpacked[1:]
+                dc_id, _1, _2, volume_id, size_type, peer_id, x, peer_access_hash, local_id = unpacked[1:]
 
                 if x == 0:
                     peer_type = "user"

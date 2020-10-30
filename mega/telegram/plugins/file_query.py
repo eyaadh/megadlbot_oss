@@ -8,7 +8,7 @@ from mega.database.files import MegaFiles
 @Client.on_inline_query()
 async def inline_query_handler(c: Client, iq: InlineQuery):
     q = iq.query
-    q_res_data = await MegaFiles().get_file_by_name(q)
+    q_res_data = await MegaFiles().get_file_by_name(q, 50)
     me = await c.get_me()
     res = []
     if q_res_data is not None:

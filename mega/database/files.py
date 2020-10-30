@@ -37,6 +37,6 @@ class MegaFiles:
     async def get_file_by_file_id(self, file_id: str):
         return self.files_collection.find_one({"file_id": file_id})
 
-    async def get_file_by_name(self, file_name: str):
-        return self.files_collection.find({"file_name": re.compile(file_name, re.IGNORECASE)})
+    async def get_file_by_name(self, file_name: str, row_limit: int):
+        return self.files_collection.find({"file_name": re.compile(file_name, re.IGNORECASE)}).limit(row_limit)
 

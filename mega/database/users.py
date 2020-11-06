@@ -4,10 +4,8 @@ from mega.database import MegaDB
 
 class MegaUsers:
     def __init__(self):
-        """
-        MegaUsers is the mongo collection for the documents that holds the details of the users such as their
+        """ MegaUsers is the mongo collection for the documents that holds the details of the users such as their
         download settings, gdrive and etc, for them users who uses the bot.
-
         Functions:
             insert_user: insert new documents, that contains the details of the new users who started using the bot.
             get_user: return the document that contains the user_id for the the given telegram user id.
@@ -65,5 +63,19 @@ class MegaUsers:
         self.user_collection.update_one(
             {"user_id": user_id}, {
                 "$set": {"f_rename_type": dld_type}
+            }
+        )
+
+    async def update_seedr_username(self, user_id: int, seedr_username: str):
+        self.user_collection.update_one(
+            {"user_id": user_id}, {
+                "$set": {"seedr_username": seedr_username}
+            }
+        )
+
+    async def update_seedr_paswd(self, user_id: int, seedr_passwd: str):
+        self.user_collection.update_one(
+            {"user_id": user_id}, {
+                "$set": {"seedr_passwd": seedr_passwd}
             }
         )

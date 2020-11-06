@@ -17,10 +17,6 @@ db_username = admin
 db_password = 
 db_name = megadlbot
 
-[seedr]
-username = something@someone.com
-pass = password
-
 [web_server]
 fqdn = localhost
 port = 8080

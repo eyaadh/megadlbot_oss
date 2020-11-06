@@ -7,6 +7,7 @@ class Common:
     def __init__(self):
         """Common: are commonly shared variables across the application that is loaded from the config file or env."""
         self.working_dir = "mega/working_dir"
+        self.on_heroku = False
 
         self.is_env = bool(os.environ.get("ENV", None))
         if self.is_env:
@@ -25,11 +26,13 @@ class Common:
             self.db_username = os.environ.get("DATABASE_DB_USERNAME")
             self.db_password = os.environ.get("DATABASE_DB_PASSWORD")
             self.db_name = os.environ.get("DATABASE_DB_NAME")
-            self.seedr_username = os.environ.get("SEEDR_USERNAME", None)
-            self.seedr_password = os.environ.get("SEEDR_PASSWORD", None)
 
-            self.web_port = os.getenv("PORT", 8080)
-            self.web_fqdn = os.environ.get("WEB_SERVER_FQDN", "0.0.0.0")
+            self.web_port = os.environ.get("WEB_SERVER_PORT", 8080)
+            if 'DYNO' in os.environ:
+                self.on_heroku = True
+                self.web_port = os.getenv("PORT", 8080)
+            self.web_bind_address = os.environ.get("WEB_SERVER_BIND_ADDRESS", "0.0.0.0")
+            self.web_fqdn = os.environ.get("WEB_SERVER_FQDN", self.web_bind_address)
         else:
             self.app_config = configparser.ConfigParser()
 
@@ -52,8 +55,6 @@ class Common:
             self.db_password = self.app_config.get("database", "db_password", fallback=None)
             self.db_name = self.app_config.get("database", "db_name")
 
-            self.seedr_username = self.app_config.get("seedr", "username", fallback=None)
-            self.seedr_password = self.app_config.get("seedr", "pass", fallback=None)
-
+            self.web_bind_address = self.app_config.get("web_server", "bind_address", fallback="0.0.0.0")
             self.web_port = int(self.app_config.get("web_server", "port", fallback=8080))
-            self.web_fqdn = self.app_config.get("web_server", "fqdn", fallback="0.0.0.0")
+            self.web_fqdn = self.app_config.get("web_server", "fqdn", fallback=self.web_bind_address)

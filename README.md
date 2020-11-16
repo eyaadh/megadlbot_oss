@@ -14,7 +14,7 @@ Megatron is a project that is very close to my heart, me being the sole brains w
 6. [Youtube-dl](https://github.com/ytdl-org/youtube-dl)
 7. [google-api-python-client](https://github.com/googleapis/google-api-python-client)
 
-The application makes use of [MongoDB](https://www.mongodb.com/) for its database, also uses [ffprobe](https://ffmpeg.org/ffprobe.html) from ffmpeg for generating media info.
+The application makes use of [MongoDB](https://www.mongodb.com/) for its database, also uses [ffprobe](https://ffmpeg.org/ffprobe.html) from ffmpeg for generating media info..
 Also optionally it makes use of [seedr](https://www.seedr.cc/) API to allow download torrents via the bot - however this is a user base setting, that end user needs to setup via options under /dldsettings
 
 To make use of google API to generate google drive links for the files that you upload, you would be required to create a service account and share its key with the bot from the available options at /dldsettings, to generate this key make use of this step by step [documentation](https://support.google.com/a/answer/7378726?hl=en) or otherwise a much in depth detailed documentation [here](https://cloud.google.com/iam/docs/creating-managing-service-account-keys). Also I have shown this process on the 18th [Video](https://youtu.be/wOrmOvRhFsk?t=469) of the YouTube Series.

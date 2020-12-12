@@ -126,13 +126,13 @@ class YTdl:
             logging.info(f"downloading file to {tmp_dir}")
             chat_id, message_id = tmp_dir.split("+")
             if d["status"] == "downloading":
+                yt_progress_updates[f"{chat_id}{message_id}"]["file_name"] = d["filename"]
                 yt_progress_updates[f"{chat_id}{message_id}"]["current"] = size.format_size(
                     int(d["downloaded_bytes"]), binary=True
                 )
                 yt_progress_updates[f"{chat_id}{message_id}"]["total"] = size.format_size(
-                    int(d["total_bytes_estimate"]), binary=True
+                    int(d["_total_bytes_str"]), binary=True
                 )
-                yt_progress_updates[f"{chat_id}{message_id}"]["file_name"] = d["filename"]
         except Exception as e:
             logging.error(e)
 

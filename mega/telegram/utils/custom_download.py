@@ -249,7 +249,7 @@ class TGCustomYield:
                     break
                 if current_part == 1:
                     yield chunk[first_part_cut:]
-                if 1 < current_part < part_count:
+                if 1 < current_part <= part_count:
                     yield chunk
 
                 r = await media_session.send(

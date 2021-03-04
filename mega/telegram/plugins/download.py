@@ -52,7 +52,7 @@ async def new_message_dl_handler(c: Client, m: Message):
         elif m.text.startswith("magnet"):
             url_details = await MegaFiles().get_file_by_url(m.text)
             files = [
-                f"<a href='http://t.me/{me.username}?start=plf-{file['file_id']}'>{file['file_name']}" \
+                f"<a href='http://t.me/{me.username}?start=plf-{file['_id']}'>{file['file_name']}"
                 f" - {file['file_type']}</a>"
                 for file in url_details
             ]
@@ -67,8 +67,8 @@ async def new_message_dl_handler(c: Client, m: Message):
         else:
             url_details = await MegaFiles().get_file_by_url(m.text)
             files = [
-                f"<a href='http://t.me/{me.username}" \
-                f"?start=plf-{file['file_id']}'>{file['file_name']} - {file['file_type']}</a>"
+                f"<a href='http://t.me/{me.username}"
+                f"?start=plf-{file['_id']}'>{file['file_name']} - {file['file_type']}</a>"
                 for file in url_details
             ]
             files_msg_formatted = '\n'.join(files)
@@ -200,10 +200,9 @@ async def callback_ytmd_handler(c: Client, cb: CallbackQuery):
     video_info = await YTdl().yt_media_info(cb_message)
 
     await cb_message.reply_text(
-        "Here is the Media Info you requested: \n"	
+        "Here is the Media Info you requested: \n"
         f"{emoji.CAT} View on nekobin.com: {video_info}"
     )
-
 
 
 @Client.on_callback_query(filters.callback_query("torrent"), group=0)
@@ -415,7 +414,7 @@ async def media_receive_handler(c: Client, m: Message):
     if "f_rename_type" not in user_settings:
         await MegaUsers().update_file_rename_settings(m.from_user.id, "disk")
 
-    fd_msg = await m.forward(
+    fd_msg = await m.copy(
         chat_id=Common().bot_dustbin
     )
 

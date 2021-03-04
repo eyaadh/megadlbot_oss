@@ -122,7 +122,7 @@ port = 8080
 
 ---
 
-7.  Run with `python3.8 -m mega`, stop with <kbd>CTRL</kbd>+<kbd>C</kbd>.
+7.  Run with `python3.9 -m mega`, stop with <kbd>CTRL</kbd>+<kbd>C</kbd>.
 > It is recommended to use [virtual environments](https://docs.python-guide.org/dev/virtualenvs/) while running the app, this is a good practice you can use at any of your python projects as virtualenv creates an isolated Python environment which is specific to your project.
 
 

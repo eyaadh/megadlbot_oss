@@ -198,9 +198,8 @@ class UploadFiles:
     @staticmethod
     async def send_file_to_dustbin(file_message: Message, media_type: str, url: str, f_type: str):
         global file_link
-        fd_msg = await file_message.forward(
-            chat_id=Common().bot_dustbin,
-            as_copy=True
+        fd_msg = await file_message.copy(
+            chat_id=Common().bot_dustbin
         )
         file_link = f"https://{Common().web_fqdn}/{fd_msg.message_id}" if Common().on_heroku else \
             f"http://{Common().web_fqdn}:{Common().web_port}/{fd_msg.message_id}"
@@ -216,7 +215,6 @@ class UploadFiles:
         if f_type != "bytesIO" and url != "":
             if media_type == "video":
                 await MegaFiles().insert_new_files(
-                    filed_id=fd_msg.video.file_id,
                     file_name=fd_msg.video.file_name,
                     msg_id=fd_msg.message_id,
                     chat_id=fd_msg.chat.id,
@@ -225,7 +223,6 @@ class UploadFiles:
                 )
             elif media_type == "audio":
                 await MegaFiles().insert_new_files(
-                    filed_id=fd_msg.audio.file_id,
                     file_name=fd_msg.audio.file_name,
                     msg_id=fd_msg.message_id,
                     chat_id=fd_msg.chat.id,
@@ -234,7 +231,6 @@ class UploadFiles:
                 )
             else:
                 await MegaFiles().insert_new_files(
-                    filed_id=fd_msg.document.file_id,
                     file_name=fd_msg.document.file_name,
                     msg_id=fd_msg.message_id,
                     chat_id=fd_msg.chat.id,

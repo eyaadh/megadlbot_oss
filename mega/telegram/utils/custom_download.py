@@ -1,13 +1,11 @@
 import math
-import struct
-import binascii
 from typing import Union
 from pyrogram.types import Message
 from mega.telegram import MegaDLBot
 from pyrogram import Client, utils, raw
 from pyrogram.session import Session, Auth
-from pyrogram.methods.messages.download_media import FileData
-from pyrogram.errors import FileIdInvalid, AuthBytesInvalid
+from pyrogram.errors import AuthBytesInvalid
+from pyrogram.file_id import FileId, FileType, ThumbnailSource
 
 
 async def chunk_size(length):
@@ -23,7 +21,7 @@ class TGCustomYield:
     def __init__(self):
         """ A custom method to stream files from telegram.
         functions:
-            generate_file_properties: returns the properties for a media on a specific message.
+            generate_file_properties: returns the properties for a media on a specific message contained in FileId class.
             generate_media_session: returns the media session for the DC that contains the media file on the message.
             yield_file: yield a file from telegram servers for streaming.
         """
@@ -34,96 +32,30 @@ class TGCustomYield:
         error_message = "This message doesn't contain any downloadable media"
         available_media = ("audio", "document", "photo", "sticker", "animation", "video", "voice", "video_note")
 
-        media_file_name = None
-        file_size = None
-        mime_type = None
-        date = None
+        if isinstance(msg, Message):
+            for kind in available_media:
+                media = getattr(msg, kind, None)
 
-        for kind in available_media:
-            media = getattr(msg, kind, None)
-
-            if media is not None:
-                break
+                if media is not None:
+                    break
+            else:
+                raise ValueError(error_message)
         else:
-            raise ValueError(error_message)
+            media = msg
 
         if isinstance(media, str):
             file_id_str = media
         else:
             file_id_str = media.file_id
-            media_file_name = getattr(media, "file_name", "")
-            file_size = getattr(media, "file_size", None)
-            mime_type = getattr(media, "mime_type", None)
-            date = getattr(media, "date", None)
-            file_ref = getattr(media, "file_ref", None)
 
-        data = FileData(
-            file_name=media_file_name,
-            file_size=file_size,
-            mime_type=mime_type,
-            date=date,
-            file_ref=file_ref
-        )
+        file_id_obj = FileId.decode(file_id_str)
 
-        def get_existing_attributes() -> dict:
-            return dict(filter(lambda x: x[1] is not None, data.__dict__.items()))
+        # The below lines are added to avoid a break in routes.py
+        setattr(file_id_obj, "file_size", getattr(media, "file_size", 0))
+        setattr(file_id_obj, "mime_type", getattr(media, "mime_type", ""))
+        setattr(file_id_obj, "file_name", getattr(media, "file_name", ""))
 
-        try:
-            decoded = utils.decode_file_id(file_id_str)
-            media_type = decoded[0]
-
-            if media_type == 1:
-                unpacked = struct.unpack("<iiqqqiiiqi", decoded)
-                dc_id, _1, _2, volume_id, size_type, peer_id, x, peer_access_hash, local_id = unpacked[1:]
-
-                if x == 0:
-                    peer_type = "user"
-                elif x == -1:
-                    peer_id = -peer_id
-                    peer_type = "chat"
-                else:
-                    peer_id = utils.get_channel_id(peer_id - 1000727379968)
-                    peer_type = "channel"
-
-                data = FileData(
-                    **get_existing_attributes(),
-                    media_type=media_type,
-                    dc_id=dc_id,
-                    peer_id=peer_id,
-                    peer_type=peer_type,
-                    peer_access_hash=peer_access_hash,
-                    volume_id=volume_id,
-                    local_id=local_id,
-                    is_big=size_type == 3
-                )
-            elif media_type in (0, 2, 14):
-                unpacked = struct.unpack("<iiqqqiiii", decoded)
-                dc_id, document_id, access_hash, volume_id, _, _, thumb_size, local_id = unpacked[1:]
-
-                data = FileData(
-                    **get_existing_attributes(),
-                    media_type=media_type,
-                    dc_id=dc_id,
-                    document_id=document_id,
-                    access_hash=access_hash,
-                    thumb_size=chr(thumb_size)
-                )
-            elif media_type in (3, 4, 5, 8, 9, 10, 13):
-                unpacked = struct.unpack("<iiqq", decoded)
-                dc_id, document_id, access_hash = unpacked[1:]
-
-                data = FileData(
-                    **get_existing_attributes(),
-                    media_type=media_type,
-                    dc_id=dc_id,
-                    document_id=document_id,
-                    access_hash=access_hash
-                )
-            else:
-                raise ValueError(f"Unknown media type: {file_id_str}")
-            return data
-        except (AssertionError, binascii.Error, struct.error):
-            raise FileIdInvalid from None
+        return file_id_obj
 
     async def generate_media_session(self, client: Client, msg: Message):
         data = await self.generate_file_properties(msg)
@@ -171,49 +103,45 @@ class TGCustomYield:
         return media_session
 
     @staticmethod
-    async def get_location(data, file_ref):
-        if data.media_type == 1:
-            if data.peer_type == "user":
+    async def get_location(file_id: FileId):
+        file_type = file_id.file_type
+
+        if file_type == FileType.CHAT_PHOTO:
+            if file_id.chat_id > 0:
                 peer = raw.types.InputPeerUser(
-                    user_id=data.peer_id,
-                    access_hash=data.peer_access_hash
-                )
-            elif data.peer_type == "chat":
-                peer = raw.types.InputPeerChat(
-                    chat_id=data.peer_id
+                    user_id=file_id.chat_id,
+                    access_hash=file_id.chat_access_hash
                 )
             else:
-                peer = raw.types.InputPeerChannel(
-                    channel_id=data.peer_id,
-                    access_hash=data.peer_access_hash
-                )
+                if file_id.chat_access_hash == 0:
+                    peer = raw.types.InputPeerChat(
+                        chat_id=-file_id.chat_id
+                    )
+                else:
+                    peer = raw.types.InputPeerChannel(
+                        channel_id=utils.get_channel_id(file_id.chat_id),
+                        access_hash=file_id.chat_access_hash
+                    )
 
             location = raw.types.InputPeerPhotoFileLocation(
                 peer=peer,
-                volume_id=data.volume_id,
-                local_id=data.local_id,
-                big=data.is_big or None
+                volume_id=file_id.volume_id,
+                local_id=file_id.local_id,
+                big=file_id.thumbnail_source == ThumbnailSource.CHAT_PHOTO_BIG
             )
-        elif data.media_type in (0, 2):
+        elif file_type == FileType.PHOTO:
             location = raw.types.InputPhotoFileLocation(
-                id=data.document_id,
-                access_hash=data.access_hash,
-                file_reference=file_ref,
-                thumb_size=data.thumb_size
-            )
-        elif data.media_type == 14:
-            location = raw.types.InputDocumentFileLocation(
-                id=data.document_id,
-                access_hash=data.access_hash,
-                file_reference=file_ref,
-                thumb_size=data.thumb_size
+                id=file_id.media_id,
+                access_hash=file_id.access_hash,
+                file_reference=file_id.file_reference,
+                thumb_size=file_id.thumbnail_size
             )
         else:
             location = raw.types.InputDocumentFileLocation(
-                id=data.document_id,
-                access_hash=data.access_hash,
-                file_reference=file_ref,
-                thumb_size=""
+                id=file_id.media_id,
+                access_hash=file_id.access_hash,
+                file_reference=file_id.file_reference,
+                thumb_size=file_id.thumbnail_size
             )
 
         return location
@@ -226,9 +154,7 @@ class TGCustomYield:
 
         current_part = 1
 
-        file_ref = utils.decode_file_ref(data.file_ref)
-
-        location = await self.get_location(data, file_ref)
+        location = await self.get_location(data)
 
         r = await media_session.send(
             raw.functions.upload.GetFile(
@@ -249,7 +175,7 @@ class TGCustomYield:
                     break
                 if current_part == 1:
                     yield chunk[first_part_cut:]
-                if 1 < current_part < part_count:
+                if 1 < current_part <= part_count:
                     yield chunk
 
                 r = await media_session.send(
@@ -267,9 +193,7 @@ class TGCustomYield:
         data = await self.generate_file_properties(media_msg)
         media_session = await self.generate_media_session(client, media_msg)
 
-        file_ref = utils.decode_file_ref(data.file_ref)
-
-        location = await self.get_location(data, file_ref)
+        location = await self.get_location(data)
 
         limit = 1024 * 1024
         offset = 0

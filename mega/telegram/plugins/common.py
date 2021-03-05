@@ -1,6 +1,5 @@
 from pyrogram import filters, emoji, Client
 from pyrogram.types import Message
-
 from mega.database.files import MegaFiles
 from mega.database.users import MegaUsers
 from ...telegram import Common
@@ -22,18 +21,15 @@ async def start_message_handler(c: Client, m: Message):
 
                 if str(file_details['file_type'].split("/"))[0].lower() == "video":
                     await m.reply_video(
-                        video=file_message.video.file_id,
-                        file_ref=file_message.video.file_ref
+                        video=file_message.video.file_id
                     )
                 elif str(file_details['file_type'].split("/"))[0].lower() == "audio":
                     await m.reply_audio(
-                        audio=file_message.audio.file_id,
-                        file_ref=file_message.audio.file_ref
+                        audio=file_message.audio.file_id
                     )
                 else:
                     await m.reply_document(
-                        document=file_message.document.file_id,
-                        file_ref=file_message.document.file_ref
+                        document=file_message.document.file_id
                     )
     else:
         await m.reply_text(

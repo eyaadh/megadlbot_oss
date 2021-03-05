@@ -11,7 +11,7 @@ Megatron is a project that is very close to my heart, me being the sole brains w
 3. [pymongo](https://github.com/mongodb/mongo-python-driver)
 4. [pyrogram](https://docs.pyrogram.org/)
 5. [tgcrypto](https://docs.pyrogram.org/topics/tgcrypto)
-6. <del>[Youtube-dl](https://github.com/ytdl-org/youtube-dl)</del> - {depreciated with RIAA taking down youtube_dl}
+6. [Youtube-dl](https://github.com/ytdl-org/youtube-dl)
 7. [google-api-python-client](https://github.com/googleapis/google-api-python-client)
 
 The application makes use of [MongoDB](https://www.mongodb.com/) for its database, also uses [ffprobe](https://ffmpeg.org/ffprobe.html) from ffmpeg for generating media info.
@@ -122,7 +122,7 @@ port = 8080
 
 ---
 
-7.  Run with `python3.8 -m mega`, stop with <kbd>CTRL</kbd>+<kbd>C</kbd>.
+7.  Run with `python3.9 -m mega`, stop with <kbd>CTRL</kbd>+<kbd>C</kbd>.
 > It is recommended to use [virtual environments](https://docs.python-guide.org/dev/virtualenvs/) while running the app, this is a good practice you can use at any of your python projects as virtualenv creates an isolated Python environment which is specific to your project.
 
 

@@ -1,7 +1,6 @@
 from pyrogram import emoji, Client
 from pyrogram.types import InlineQuery, InlineQueryResultArticle, InputTextMessageContent, \
     InlineKeyboardMarkup, InlineKeyboardButton
-
 from mega.database.files import MegaFiles
 
 
@@ -25,7 +24,7 @@ async def inline_query_handler(c: Client, iq: InlineQuery):
                     reply_markup=InlineKeyboardMarkup(
                         [
                             [InlineKeyboardButton(text=f"{emoji.OPEN_MAILBOX_WITH_LOWERED_FLAG} Get this File",
-                                                  url=f"http://t.me/{me.username}?start=plf-{file['file_id']}")]
+                                                  url=f"http://t.me/{me.username}?start=plf-{file['_id']}")]
                         ]
                     )
                 )
@@ -37,3 +36,5 @@ async def inline_query_handler(c: Client, iq: InlineQuery):
             cache_time=0,
             is_personal=False
         )
+    else:
+        await iq.answer([])

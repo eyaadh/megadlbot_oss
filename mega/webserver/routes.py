@@ -5,6 +5,7 @@ import mimetypes
 from aiohttp import web
 from mega.common import Common
 from mega.telegram import MegaDLBot
+from mega.helpers.seerd_api import SeedrAPI
 from mega.telegram.utils.custom_download import TGCustomYield, chunk_size, offset_fix
 
 routes = web.RouteTableDef()
@@ -18,7 +19,7 @@ async def root_route_handler(request):
                               "bot_associated_w": bot_details.username})
 
 
-@routes.get("/{message_id}")
+@routes.get("/stream/{message_id}")
 async def stream_handler(request):
     try:
         message_id = int(request.match_info['message_id'])
@@ -73,3 +74,32 @@ async def media_streamer(request, message_id: int):
 
     return return_resp
 
+
+@routes.get("/seedr/{user_id}/{folder_id}")
+async def seedr_stream_handler(request):
+    folder_id = request.match_info['folder_id']
+    user_id = int(request.match_info['user_id'])
+    headers = await SeedrAPI().get_seedr_headers(user_id, folder_id)
+
+    size = int(headers['Content-Length'])
+
+    offset = request.http_range.start or 0
+    limit = request.http_range.stop or size
+
+    range_head = {"Range": f"bytes={offset}-{limit}"}
+
+    body = SeedrAPI().yield_seedr_stream(user_id, folder_id, range_head)
+
+    return_resp = web.Response(
+        status=206 if offset else 200,
+        body=body,
+        headers={
+            "Content-Range": f"bytes {offset}-{size}/{size}",
+            "Content-Length": str(limit - offset),
+            'Content-Type': headers.get('Content-Type'),
+            'Content-Disposition': f'inline; filename="{secrets.token_hex(4)}.zip"',
+            'Accept-ranges': 'bytes'
+        }
+    )
+
+    return return_resp

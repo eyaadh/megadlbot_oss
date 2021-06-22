@@ -373,7 +373,11 @@ async def call_seedr_download(msg: Message, torrent_type: str):
                 else:
                     await asyncio.sleep(10)
                     tr_progress = await SeedrAPI().get_torrent_details(tr_process["user_torrent_id"], msg.chat.id)
-                    await ack_msg.edit_text("How would you like to upload the contents?")
+                    file_link = f"https://{Common().web_fqdn}/seedr/{msg.chat.id}/{str(tr_progress['folder_created'])}" if Common().on_heroku else \
+                        f"http://{Common().web_fqdn}:{Common().web_port}/seedr/{msg.chat.id}/{str(tr_progress['folder_created'])}"
+                    await ack_msg.edit_text(f"How would you like to upload the contents?\n"
+                                            f"Here is the Direct Link for the File: \n"
+                                            f"{file_link}")
                     await ack_msg.edit_reply_markup(
                         InlineKeyboardMarkup(
                             [
@@ -418,8 +422,8 @@ async def media_receive_handler(c: Client, m: Message):
         chat_id=Common().bot_dustbin
     )
 
-    file_link = f"https://{Common().web_fqdn}/{fd_msg.message_id}" if Common().on_heroku else \
-        f"http://{Common().web_fqdn}:{Common().web_port}/{fd_msg.message_id}"
+    file_link = f"https://{Common().web_fqdn}/stream/{fd_msg.message_id}" if Common().on_heroku else \
+        f"http://{Common().web_fqdn}:{Common().web_port}/stream/{fd_msg.message_id}"
 
     await m.reply_text(
         text="What would you like to do with this file?",

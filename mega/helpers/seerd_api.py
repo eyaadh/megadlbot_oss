@@ -7,6 +7,7 @@ import logging
 import secrets
 import zipfile
 import aiofiles
+from typing import AsyncGenerator
 import humanfriendly as size
 from mega.common import Common
 from pyrogram.types import Message
@@ -179,3 +180,30 @@ class SeedrAPI:
                 shutil.rmtree(parent_path)
             except Exception as e:
                 logging.error(str(e))
+
+    async def get_seedr_headers(self, user_id: int, folder_id: str):
+        user_details = await MegaUsers().get_user(user_id)
+        async with aiohttp.ClientSession() as seedr_session:
+            async with seedr_session.get(
+                    url=f"{self.web_dav}/folder/{folder_id}/download",
+                    auth=aiohttp.BasicAuth(
+                        user_details["seedr_username"],
+                        user_details["seedr_passwd"]
+                    )
+            ) as resp:
+                header = resp.headers
+                return header
+
+    async def yield_seedr_stream(self, user_id: int, folder_id: str, header: dict) -> AsyncGenerator[bytes, None]:
+        user_details = await MegaUsers().get_user(user_id)
+        async with aiohttp.ClientSession(headers=header) as seedr_session:
+            async with seedr_session.get(
+                    url=f"{self.web_dav}/folder/{folder_id}/download",
+                    auth=aiohttp.BasicAuth(
+                        user_details["seedr_username"],
+                        user_details["seedr_passwd"]
+                    ),
+                    timeout=None
+            ) as resp:
+                async for chunk in resp.content.iter_any():
+                    yield chunk

@@ -201,8 +201,8 @@ class UploadFiles:
         fd_msg = await file_message.copy(
             chat_id=Common().bot_dustbin
         )
-        file_link = f"https://{Common().web_fqdn}/{fd_msg.message_id}" if Common().on_heroku else \
-            f"http://{Common().web_fqdn}:{Common().web_port}/{fd_msg.message_id}"
+        file_link = f"https://{Common().web_fqdn}/stream/{fd_msg.message_id}" if Common().on_heroku else \
+            f"http://{Common().web_fqdn}:{Common().web_port}/stream/{fd_msg.message_id}"
 
         await file_message.edit_reply_markup(
             reply_markup=InlineKeyboardMarkup(
